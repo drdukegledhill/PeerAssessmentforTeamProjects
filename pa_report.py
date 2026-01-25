@@ -212,8 +212,8 @@ def generate_report(students, raw_avgs, normalised, comments, group_mean, adjust
         title: Title for the report header
     """
     
-    # Sort students by normalised score in descending order (highest first)
-    sorted_students = sorted(students.keys(), key=lambda s: normalised.get(s, 0), reverse=True)
+    # Keep students in original order from CSV (Python dicts preserve insertion order)
+    student_list = list(students.keys())
     
     # Print report header with decorative border
     print("=" * 70)
@@ -237,7 +237,7 @@ def generate_report(students, raw_avgs, normalised, comments, group_mean, adjust
     print("-" * 70)
     
     # Print each student's row in the summary table
-    for rank, student in enumerate(sorted_students, 1):  # enumerate starting at 1 for ranking
+    for rank, student in enumerate(student_list, 1):  # enumerate starting at 1 for ranking
         print(f"{rank:<6}{student:<30}{raw_avgs[student]:>12.2f}{normalised[student]:>12}")
     
     print("-" * 70)
@@ -259,7 +259,7 @@ def generate_report(students, raw_avgs, normalised, comments, group_mean, adjust
     print("=" * 70)
     
     # Generate feedback block for each student
-    for student in sorted_students:
+    for student in student_list:
         print()
         print(f">>> {student}")
         print(f"    Score: {normalised[student]}")
