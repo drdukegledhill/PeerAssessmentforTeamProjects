@@ -171,7 +171,8 @@ def generate_report(students, raw_avgs, normalized, comments, group_mean, adjust
         print()
         if comments[student]:
             print("    Peer Comments:")
-            print("    " + " | ".join(comments[student]))
+            for comment in comments[student]:
+                print(f"    - {comment}")
         else:
             print("    Peer Comments: (No comments provided)")
         print()
@@ -180,9 +181,9 @@ def generate_report(students, raw_avgs, normalized, comments, group_mean, adjust
 
 def main():
     if len(sys.argv) < 2:
-        print("Usage: python3 peer_assessment_report.py <csv_file>")
+        print("Usage: python3 pa_report.py <csv_file>")
         print()
-        print("Example: python3 peer_assessment_report.py responses.csv")
+        print("Example: python3 pa_report.py responses.csv")
         sys.exit(1)
     
     filepath = sys.argv[1]
