@@ -233,12 +233,12 @@ def generate_report(students, raw_avgs, normalised, comments, group_mean, adjust
     print("SUMMARY TABLE")
     print("-" * 70)
     # Format column headers with specific widths: <6 left-align 6 chars, >12 right-align 12 chars
-    print(f"{'Rank':<6}{'Student':<30}{'Raw Avg':>12}{'Score':>12}")
+    print(f"{'#':<6}{'Student':<30}{'Raw Avg':>12}{'Score':>12}")
     print("-" * 70)
     
     # Print each student's row in the summary table
-    for rank, student in enumerate(student_list, 1):  # enumerate starting at 1 for ranking
-        print(f"{rank:<6}{student:<30}{raw_avgs[student]:>12.2f}{normalised[student]:>12}")
+    for num, student in enumerate(student_list, 1):  # enumerate starting at 1 for numbering
+        print(f"{num:<6}{student:<30}{raw_avgs[student]:>12.2f}{normalised[student]:>12}")
     
     print("-" * 70)
     

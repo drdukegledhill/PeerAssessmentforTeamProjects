@@ -6,7 +6,7 @@ A Python tool for analysing peer assessment data from team projects and generati
 
 This tool processes peer assessment CSV files (typically exported from Google Forms) and produces:
 - **Normalised scores** (0-9 scale) that centre around a target median of 5
-- **Summary tables** ranking students by their peer-assessed contribution
+- **Summary tables** with each student's raw and normalised scores
 - **Individual feedback** with aggregated peer comments
 
 The tool automatically detects students and adapts to any group size, excluding self-assessments from calculations.
@@ -16,7 +16,7 @@ The tool automatically detects students and adapts to any group size, excluding 
 - ✅ Automatic student detection from CSV headers
 - ✅ Self-assessment exclusion
 - ✅ Score normalisation to centre group mean around target (default: 5)
-- ✅ Ranked summary table with raw and normalised scores
+- ✅ Summary table with raw and normalised scores
 - ✅ Individual feedback sections with peer comments
 - ✅ Works with any group size
 
@@ -68,7 +68,7 @@ The tool generates a report with:
    - Normalisation adjustment applied
    
 2. **Summary Table**
-   - Ranked list of all students
+   - List of all students (in original order)
    - Raw average scores
    - Normalised final scores (0-9)
 
