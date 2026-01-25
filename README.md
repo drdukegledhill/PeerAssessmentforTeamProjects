@@ -47,16 +47,36 @@ The tool expects a CSV file with the following column patterns:
 | Overall contribution | `Please rate [the] overall contribution from [Student Name]` |
 | Justification/Comments | Column immediately following the overall contribution column |
 
+### Example CSV
+
+For a team of 3 students (Alice, Bob, Charlie), the minimum CSV structure would be:
+
+```csv
+Select your name,Please rate overall contribution from Alice,Justify Alice,Please rate overall contribution from Bob,Justify Bob,Please rate overall contribution from Charlie,Justify Charlie
+Alice,7,Self assessment,8,Great teamwork,6,Could communicate more
+Bob,7,Very organised,5,Self assessment,7,Reliable
+Charlie,8,Led the project well,7,Helpful,6,Self assessment
+```
+
+### Google Form Setup
+
+To generate a compatible CSV, create a Google Form with the following questions:
+
+1. **Dropdown question**: "Select your name"
+   - Add all team member names as options
+
+2. **For each team member**, add:
+   - **Linear scale (1-9)**: "Please rate overall contribution from [Name]"
+   - **Short answer or paragraph**: A justification question (e.g., "Justify your rating for [Name]")
+
+> **Tip:** The justification question text doesn't matter — the tool simply uses the column immediately after each "overall contribution" column.
+
 ### Getting CSV Data from Google Forms
 
 1. **Create a Google Form** for peer assessment with questions for each team member
 2. **Link responses to a Google Sheet**: In Google Forms, go to the "Responses" tab and click the green Sheets icon to create a linked spreadsheet
 3. **Export as CSV**: In Google Sheets, go to `File` → `Download` → `Comma Separated Values (.csv)`
 4. **Run the report**: Use the downloaded CSV file with this tool
-
-### Sample CSV Structure
-
-The CSV should be exported from a peer assessment form where each student rates all team members on their overall contribution (1-9 scale) and provides justification comments.
 
 ## Output
 
