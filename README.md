@@ -47,6 +47,13 @@ The tool expects a CSV file with the following column patterns:
 | Overall contribution | `Please rate [the] overall contribution from [Student Name]` |
 | Justification/Comments | Column immediately following the overall contribution column |
 
+### Getting CSV Data from Google Forms
+
+1. **Create a Google Form** for peer assessment with questions for each team member
+2. **Link responses to a Google Sheet**: In Google Forms, go to the "Responses" tab and click the green Sheets icon to create a linked spreadsheet
+3. **Export as CSV**: In Google Sheets, go to `File` → `Download` → `Comma Separated Values (.csv)`
+4. **Run the report**: Use the downloaded CSV file with this tool
+
 ### Sample CSV Structure
 
 The CSV should be exported from a peer assessment form where each student rates all team members on their overall contribution (1-9 scale) and provides justification comments.
