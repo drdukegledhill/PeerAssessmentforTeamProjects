@@ -28,13 +28,13 @@ The tool automatically detects students and adapts to any group size, excluding 
 ## Usage
 
 ```bash
-python3 peer_assessment_report.py <csv_file>
+python3 pa_report.py <csv_file>
 ```
 
 ### Example
 
 ```bash
-python3 peer_assessment_report.py "NHE2443_PA_Concept (Responses) - Dungeoneers.csv"
+python3 pa_report.py "NHE2443_PA_Concept (Responses) - Dungeoneers.csv"
 ```
 
 ## CSV Format
