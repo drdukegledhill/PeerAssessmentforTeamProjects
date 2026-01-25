@@ -1,0 +1,2 @@
+# Data files - exclude student data for privacy
+*.csv
