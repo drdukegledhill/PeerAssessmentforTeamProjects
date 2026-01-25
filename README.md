@@ -58,6 +58,66 @@ Bob,7,Very organised,5,Self assessment,7,Reliable
 Charlie,8,Led the project well,7,Helpful,6,Self assessment
 ```
 
+### Example Output
+
+Running the tool on the above CSV produces:
+
+```
+Detected 3 students: Alice, Bob, Charlie
+
+======================================================================
+PEER ASSESSMENT REPORT
+======================================================================
+
+Total students: 3
+Group mean (raw): 7.17
+Normalisation adjustment: -2.17
+Target median: 5
+
+----------------------------------------------------------------------
+SUMMARY TABLE
+----------------------------------------------------------------------
+#     Student                          Raw Avg       Score
+----------------------------------------------------------------------
+1     Alice                               7.50           5
+2     Bob                                 7.50           5
+3     Charlie                             6.50           4
+----------------------------------------------------------------------
+                                    Group Mean:        4.67
+                                       Median:           5
+
+======================================================================
+INDIVIDUAL FEEDBACK
+======================================================================
+
+>>> Alice
+    Score: 5
+
+    Peer Comments:
+    - Very organised
+    - Led the project well
+
+----------------------------------------------------------------------
+
+>>> Bob
+    Score: 5
+
+    Peer Comments:
+    - Great teamwork
+    - Helpful
+
+----------------------------------------------------------------------
+
+>>> Charlie
+    Score: 4
+
+    Peer Comments:
+    - Could communicate more
+    - Reliable
+
+----------------------------------------------------------------------
+```
+
 ### Google Form Setup
 
 To generate a compatible CSV, create a Google Form with the following questions:
