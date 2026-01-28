@@ -25,6 +25,8 @@ A web version is now available in the `/docs` folder. It allows you to upload a 
 2. Use the file upload button to select a CSV file.
 3. The full peer assessment report will be generated and displayed, matching the Python output.
 
+Note: The web UI displays a version number (currently v1.0) at the top, which is incremented with each change for easy tracking.
+
 No backend or installation required—everything runs in your browser.
 
 ## Requirements
