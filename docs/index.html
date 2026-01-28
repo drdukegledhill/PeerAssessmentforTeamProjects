@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Peer Assessment CSV Report</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 2em; background: #f9f9f9; }
+        h1 { color: #333; }
+        .container { max-width: 800px; margin: auto; background: #fff; padding: 2em; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+        input[type="file"] { margin-bottom: 1em; }
+        table { border-collapse: collapse; width: 100%; margin-top: 1em; }
+        th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+        th { background: #eee; }
+        tr:nth-child(even) { background: #f2f2f2; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Peer Assessment CSV Report</h1>
+        <input type="file" id="csvFile" accept=".csv" />
+        <div id="output"></div>
+    </div>
+    <script>
+        document.getElementById('csvFile').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const text = e.target.result;
+                renderTable(parseCSV(text));
+            };
+            reader.readAsText(file);
+        });
+
+        function parseCSV(text) {
+            const lines = text.split(/\r?\n/).filter(line => line.trim() !== '');
+            return lines.map(line => {
+                // Simple CSV split, handles quoted fields
+                const regex = /(?:"([^"]*)")|([^,]+)/g;
+                let match, row = [];
+                while ((match = regex.exec(line)) !== null) {
+                    row.push(match[1] || match[2]);
+                }
+                return row;
+            });
+        }
+
+        function renderTable(data) {
+            if (!data.length) {
+                document.getElementById('output').innerHTML = '<p>No data found.</p>';
+                return;
+            }
+            let html = '<table><thead><tr>';
+            data[0].forEach(col => {
+                html += `<th>${col}</th>`;
+            });
+            html += '</tr></thead><tbody>';
+            for (let i = 1; i < data.length; i++) {
+                html += '<tr>';
+                data[i].forEach(cell => {
+                    html += `<td>${cell}</td>`;
+                });
+                html += '</tr>';
+            }
+            html += '</tbody></table>';
+            document.getElementById('output').innerHTML = html;
+        }
+    </script>
+</body>
+</html>

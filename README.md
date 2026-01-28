@@ -13,12 +13,18 @@ The tool automatically detects students and adapts to any group size, excluding 
 
 ## Features
 
-- ✅ Automatic student detection from CSV headers
-- ✅ Self-assessment exclusion
-- ✅ Score normalisation to centre group mean around target (default: 5)
-- ✅ Summary table with raw and normalised scores
-- ✅ Individual feedback sections with peer comments
-- ✅ Works with any group size
+
+## Web Version
+
+A simple web version is now available in the `/docs` folder. It allows you to upload a CSV file and view the processed data as a table directly in your browser.
+
+### Usage
+
+1. Open `docs/index.html` in your web browser.
+2. Use the file upload button to select a CSV file.
+3. The contents will be rendered as a table on the page.
+
+No backend or installation required—everything runs in your browser.
 
 ## Requirements
 
