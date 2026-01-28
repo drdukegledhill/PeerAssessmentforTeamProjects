@@ -19,12 +19,17 @@ The tool automatically detects students and adapts to any group size, excluding 
 
 A web version is now available in the `/docs` folder. It allows you to upload a CSV file and generates the same peer assessment report as the Python script: normalised scores, summary table, individual feedback, group statistics, and comments—all rendered in your browser. The web version does not display the raw CSV data; it only shows the analysed report output, matching the Python results.
 
+#
+# [View Documentation](docs/index.html)
+
+## Full Website
+
+[https://drdukegledhill.github.io/PeerAssessmentforTeamProjects/](https://drdukegledhill.github.io/PeerAssessmentforTeamProjects/)
+
 ### Usage
 
 1. Open `docs/index.html` in your web browser.
 2. Use the file upload button to select a CSV file.
-3. The full peer assessment report will be generated and displayed, matching the Python output.
-
 Note: The web UI displays a version number (currently v1.7) at the top, which is incremented with each change for easy tracking. As of v1.1, peer comments that are just numbers (likely from adjacent columns) are filtered out and not shown. As of v1.3, median calculation matches the Python logic exactly. As of v1.5, self-assessment scores are excluded from averages and group mean, matching Python. As of v1.6, normalised scores use bankers rounding (round half to even). As of v1.7, the CSV parser preserves empty cells for full compatibility.
 
 No backend or installation required—everything runs in your browser.
