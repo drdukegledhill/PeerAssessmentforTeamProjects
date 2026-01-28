@@ -21,6 +21,9 @@
         <input type="file" id="csvFile" accept=".csv" />
         <div id="output"></div>
     </div>
+    <footer style="text-align:center;margin-top:3em;color:#888;font-size:0.95em;">
+        &copy; Dr Duke Gledhill 2026
+    </footer>
     <script>
         // Only render analysed report, never raw CSV
         document.getElementById('csvFile').addEventListener('change', function(e) {
@@ -186,7 +189,7 @@
 
             html += `<h2>Individual Feedback</h2>`;
             studentList.forEach(student => {
-                html += `<div style=\"margin-bottom:2em;padding:1em;border:1px solid #eee;border-radius:6px;background:#fafafa;\">`;
+                html += `<div style="margin-bottom:2em;padding:1em;border:1px solid #eee;border-radius:6px;background:#fafafa;">`;
                 html += `<h3>${student}</h3>`;
                 html += `<p><b>Score:</b> ${normalised[student]}</p>`;
                 if (comments[student].length) {
