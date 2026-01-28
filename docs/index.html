@@ -18,6 +18,7 @@
 <body>
     <div class="container">
         <h1>Peer Assessment Report <span style="font-size:0.7em;color:#888;">v1.2</span></h1>
+        <h1>Peer Assessment Report <span style="font-size:0.7em;color:#888;">v1.3</span></h1>
         <input type="file" id="csvFile" accept=".csv" />
         <div id="output"></div>
     </div>
@@ -134,7 +135,11 @@
             const normVals = Object.values(normalised);
             const intMean = normVals.length ? normVals.reduce((a,b)=>a+b,0)/normVals.length : 0;
             const sortedVals = [...normVals].sort((a,b)=>a-b);
-            const median = sortedVals.length ? sortedVals[Math.floor(sortedVals.length/2)] : 0;
+            let median = 0;
+            if (sortedVals.length) {
+                // Python logic: median is middle value (not mean of two if even count)
+                median = sortedVals[Math.floor(sortedVals.length/2)];
+            }
             html += `<p><b>Group Mean:</b> ${intMean.toFixed(2)}<br><b>Median:</b> ${median}</p>`;
 
             html += `<h2>Individual Feedback</h2>`;
