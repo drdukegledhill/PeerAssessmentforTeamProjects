@@ -17,7 +17,7 @@
 </head>
 <body>
     <div class="container">
-        <h1>Peer Assessment Report <span style="font-size:0.7em;color:#888;">v1.4</span></h1>
+        <h1>Peer Assessment Report <span style="font-size:0.7em;color:#888;">v1.5</span></h1>
         <input type="file" id="csvFile" accept=".csv" />
         <div id="output"></div>
     </div>
@@ -82,10 +82,11 @@
                     const score = parseInt(row[cols.overall]);
                     if (!isNaN(score)) {
                         scores.push(score);
-                        allScores.push(score);
                     }
                 });
                 rawAvgs[student] = scores.length ? scores.reduce((a,b) => a+b,0)/scores.length : 0;
+                // Add all peer scores (excluding self-assessment) to allScores for group mean
+                allScores = allScores.concat(scores);
             });
 
             // Normalise scores
