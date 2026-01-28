@@ -17,7 +17,7 @@ The tool automatically detects students and adapts to any group size, excluding 
 ## Web Version
 
 
-A web version is now available in the `/docs` folder. It allows you to upload a CSV file and generates the same peer assessment report as the Python script: normalised scores, summary table, individual feedback, group statistics, and comments—all rendered in your browser.
+A web version is now available in the `/docs` folder. It allows you to upload a CSV file and generates the same peer assessment report as the Python script: normalised scores, summary table, individual feedback, group statistics, and comments—all rendered in your browser. The web version does not display the raw CSV data; it only shows the analysed report output, matching the Python results.
 
 ### Usage
 

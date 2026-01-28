@@ -17,18 +17,19 @@
 </head>
 <body>
     <div class="container">
-        <h1>Peer Assessment CSV Report</h1>
+        <h1>Peer Assessment Report</h1>
         <input type="file" id="csvFile" accept=".csv" />
         <div id="output"></div>
     </div>
     <script>
+        // Only render analysed report, never raw CSV
         document.getElementById('csvFile').addEventListener('change', function(e) {
             const file = e.target.files[0];
             if (!file) return;
             const reader = new FileReader();
             reader.onload = function(e) {
                 const text = e.target.result;
-                renderTable(parseCSV(text));
+                processPeerAssessmentCSV(text);
             };
             reader.readAsText(file);
         });
@@ -36,7 +37,7 @@
         function parseCSV(text) {
             const lines = text.split(/\r?\n/).filter(line => line.trim() !== '');
             return lines.map(line => {
-                // Simple CSV split, handles quoted fields
+                // Handles quoted fields and commas
                 const regex = /(?:"([^"]*)")|([^,]+)/g;
                 let match, row = [];
                 while ((match = regex.exec(line)) !== null) {
@@ -46,24 +47,111 @@
             });
         }
 
-        function renderTable(data) {
-            if (!data.length) {
+        function processPeerAssessmentCSV(text) {
+            const rows = parseCSV(text);
+            if (!rows.length) {
                 document.getElementById('output').innerHTML = '<p>No data found.</p>';
                 return;
             }
-            let html = '<table><thead><tr>';
-            data[0].forEach(col => {
-                html += `<th>${col}</th>`;
+            const headers = rows[0];
+            const data = rows.slice(1);
+
+            // Extract students and columns
+            const overallPattern = /Please rate (?:the )?overall contribution from (.+)/i;
+            let students = {};
+            headers.forEach((header, i) => {
+                const match = overallPattern.exec(header);
+                if (match) {
+                    const name = match[1].trim();
+                    students[name] = {
+                        overall: i,
+                        justification: i + 1
+                    };
+                }
             });
-            html += '</tr></thead><tbody>';
-            for (let i = 1; i < data.length; i++) {
-                html += '<tr>';
-                data[i].forEach(cell => {
-                    html += `<td>${cell}</td>`;
+            // Find respondent name column
+            let nameCol = headers.findIndex(h => /select your name|your name/i.test(h));
+
+            // Calculate raw averages and collect all scores
+            let rawAvgs = {}, allScores = [];
+            Object.entries(students).forEach(([student, cols]) => {
+                let scores = [];
+                data.forEach(row => {
+                    const rater = nameCol !== -1 ? row[nameCol] : null;
+                    if (rater === student) return;
+                    const score = parseInt(row[cols.overall]);
+                    if (!isNaN(score)) {
+                        scores.push(score);
+                        allScores.push(score);
+                    }
                 });
-                html += '</tr>';
-            }
-            html += '</tbody></table>';
+                rawAvgs[student] = scores.length ? scores.reduce((a,b) => a+b,0)/scores.length : 0;
+            });
+
+            // Normalise scores
+            const target = 5;
+            const groupMean = allScores.length ? allScores.reduce((a,b) => a+b,0)/allScores.length : 0;
+            const adjustment = target - groupMean;
+            let normalised = {};
+            Object.entries(rawAvgs).forEach(([student, raw]) => {
+                let normScore = raw + adjustment;
+                normScore = Math.round(normScore);
+                normScore = Math.max(0, Math.min(9, normScore));
+                normalised[student] = normScore;
+            });
+
+            // Extract comments
+            let comments = {};
+            Object.entries(students).forEach(([student, cols]) => {
+                comments[student] = [];
+                data.forEach(row => {
+                    const rater = nameCol !== -1 ? row[nameCol] : null;
+                    if (rater === student) return;
+                    const comment = (row[cols.justification]||'').trim();
+                    if (comment) comments[student].push(comment);
+                });
+            });
+
+            // Render report
+            renderReport({students, rawAvgs, normalised, comments, groupMean, adjustment});
+        }
+
+        function renderReport({students, rawAvgs, normalised, comments, groupMean, adjustment}) {
+            const studentList = Object.keys(students);
+            let html = '';
+            html += `<h2>Summary Statistics</h2>`;
+            html += `<p>Total students: ${studentList.length}<br>Group mean (raw): ${groupMean.toFixed(2)}<br>Normalisation adjustment: ${adjustment >= 0 ? '+' : ''}${adjustment.toFixed(2)}<br>Target median: 5</p>`;
+
+            html += `<h2>Summary Table</h2>`;
+            html += `<table><thead><tr><th>#</th><th>Student</th><th>Raw Avg</th><th>Score</th></tr></thead><tbody>`;
+            studentList.forEach((student, i) => {
+                html += `<tr><td>${i+1}</td><td>${student}</td><td>${rawAvgs[student].toFixed(2)}</td><td>${normalised[student]}</td></tr>`;
+            });
+            html += `</tbody></table>`;
+
+            // Group stats
+            const normVals = Object.values(normalised);
+            const intMean = normVals.length ? normVals.reduce((a,b)=>a+b,0)/normVals.length : 0;
+            const sortedVals = [...normVals].sort((a,b)=>a-b);
+            const median = sortedVals.length ? sortedVals[Math.floor(sortedVals.length/2)] : 0;
+            html += `<p><b>Group Mean:</b> ${intMean.toFixed(2)}<br><b>Median:</b> ${median}</p>`;
+
+            html += `<h2>Individual Feedback</h2>`;
+            studentList.forEach(student => {
+                html += `<div style=\"margin-bottom:2em;padding:1em;border:1px solid #eee;border-radius:6px;background:#fafafa;\">`;
+                html += `<h3>${student}</h3>`;
+                html += `<p><b>Score:</b> ${normalised[student]}</p>`;
+                if (comments[student].length) {
+                    html += `<b>Peer Comments:</b><ul>`;
+                    comments[student].forEach(comment => {
+                        html += `<li>${comment}</li>`;
+                    });
+                    html += `</ul>`;
+                } else {
+                    html += `<b>Peer Comments:</b> (No comments provided)`;
+                }
+                html += `</div>`;
+            });
             document.getElementById('output').innerHTML = html;
         }
     </script>
