@@ -17,7 +17,7 @@
 </head>
 <body>
     <div class="container">
-        <h1>Peer Assessment Report <span style="font-size:0.7em;color:#888;">v1.5</span></h1>
+        <h1>Peer Assessment Report <span style="font-size:0.7em;color:#888;">v1.6</span></h1>
         <input type="file" id="csvFile" accept=".csv" />
         <div id="output"></div>
     </div>
@@ -94,9 +94,16 @@
             const groupMean = allScores.length ? allScores.reduce((a,b) => a+b,0)/allScores.length : 0;
             const adjustment = target - groupMean;
             let normalised = {};
+            function bankersRound(n) {
+                // Bankers rounding: round .5 to even
+                const f = Math.floor(n);
+                const frac = n - f;
+                if (frac !== 0.5 && frac !== -0.5) return Math.round(n);
+                return (f % 2 === 0) ? f : f + 1;
+            }
             Object.entries(rawAvgs).forEach(([student, raw]) => {
                 let normScore = raw + adjustment;
-                normScore = Math.round(normScore);
+                normScore = bankersRound(normScore);
                 normScore = Math.max(0, Math.min(9, normScore));
                 normalised[student] = normScore;
             });

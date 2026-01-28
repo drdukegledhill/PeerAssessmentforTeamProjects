@@ -25,7 +25,7 @@ A web version is now available in the `/docs` folder. It allows you to upload a 
 2. Use the file upload button to select a CSV file.
 3. The full peer assessment report will be generated and displayed, matching the Python output.
 
-Note: The web UI displays a version number (currently v1.5) at the top, which is incremented with each change for easy tracking. As of v1.1, peer comments that are just numbers (likely from adjacent columns) are filtered out and not shown. As of v1.3, median calculation matches the Python logic exactly. As of v1.5, self-assessment scores are excluded from averages and group mean, matching Python.
+Note: The web UI displays a version number (currently v1.6) at the top, which is incremented with each change for easy tracking. As of v1.1, peer comments that are just numbers (likely from adjacent columns) are filtered out and not shown. As of v1.3, median calculation matches the Python logic exactly. As of v1.5, self-assessment scores are excluded from averages and group mean, matching Python. As of v1.6, normalised scores use bankers rounding (round half to even).
 
 No backend or installation required—everything runs in your browser.
 
