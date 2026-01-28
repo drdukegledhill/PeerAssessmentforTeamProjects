@@ -17,7 +17,7 @@
 </head>
 <body>
     <div class="container">
-        <h1>Peer Assessment Report <span style="font-size:0.7em;color:#888;">v1.6</span></h1>
+        <h1>Peer Assessment Report <span style="font-size:0.7em;color:#888;">v1.7</span></h1>
         <input type="file" id="csvFile" accept=".csv" />
         <div id="output"></div>
     </div>
@@ -34,17 +34,52 @@
             reader.readAsText(file);
         });
 
+        // CSV parser that preserves empty cells
         function parseCSV(text) {
-            const lines = text.split(/\r?\n/).filter(line => line.trim() !== '');
-            return lines.map(line => {
-                // Handles quoted fields and commas
-                const regex = /(?:"([^"]*)")|([^,]+)/g;
-                let match, row = [];
-                while ((match = regex.exec(line)) !== null) {
-                    row.push(match[1] || match[2]);
-                }
-                return row;
-            });
+          const rows = [];
+          let row = [];
+          let field = "";
+          let inQuotes = false;
+
+          // Normalise line endings
+          text = text.replace(/\r\n/g, "\n").replace(/\r/g, "\n");
+
+          for (let i = 0; i < text.length; i++) {
+            const c = text[i];
+            const next = text[i + 1];
+
+            if (inQuotes) {
+              if (c === '"' && next === '"') {
+                field += '"'; // escaped quote
+                i++;
+              } else if (c === '"') {
+                inQuotes = false;
+              } else {
+                field += c;
+              }
+            } else {
+              if (c === '"') {
+                inQuotes = true;
+              } else if (c === ",") {
+                row.push(field);
+                field = "";
+              } else if (c === "\n") {
+                row.push(field);
+                field = "";
+                // Skip completely empty trailing line
+                if (row.length > 1 || row[0].trim() !== "") rows.push(row);
+                row = [];
+              } else {
+                field += c;
+              }
+            }
+          }
+
+          // Last field/row
+          row.push(field);
+          if (row.length > 1 || row[0].trim() !== "") rows.push(row);
+
+          return rows;
         }
 
         function processPeerAssessmentCSV(text) {
