@@ -16,13 +16,14 @@ The tool automatically detects students and adapts to any group size, excluding 
 
 ## Web Version
 
-A simple web version is now available in the `/docs` folder. It allows you to upload a CSV file and view the processed data as a table directly in your browser.
+
+A web version is now available in the `/docs` folder. It allows you to upload a CSV file and generates the same peer assessment report as the Python script: normalised scores, summary table, individual feedback, group statistics, and comments—all rendered in your browser.
 
 ### Usage
 
 1. Open `docs/index.html` in your web browser.
 2. Use the file upload button to select a CSV file.
-3. The contents will be rendered as a table on the page.
+3. The full peer assessment report will be generated and displayed, matching the Python output.
 
 No backend or installation required—everything runs in your browser.
 
