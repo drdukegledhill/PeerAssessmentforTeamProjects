@@ -30,7 +30,6 @@ A web version is now available in the `/docs` folder. It allows you to upload a 
 
 1. Open `docs/index.html` in your web browser.
 2. Use the file upload button to select a CSV file.
-Note: The web UI displays a version number (currently v1.7) at the top, which is incremented with each change for easy tracking. As of v1.1, peer comments that are just numbers (likely from adjacent columns) are filtered out and not shown. As of v1.3, median calculation matches the Python logic exactly. As of v1.5, self-assessment scores are excluded from averages and group mean, matching Python. As of v1.6, normalised scores use bankers rounding (round half to even). As of v1.7, the CSV parser preserves empty cells for full compatibility.
 
 No backend or installation required—everything runs in your browser.
 
@@ -48,7 +47,7 @@ python3 pa_report.py <csv_file>
 ### Example
 
 ```bash
-python3 pa_report.py "NHE2443_PA_Concept (Responses) - Dungeoneers.csv"
+python3 pa_report.py "team1.csv"
 ```
 
 ## CSV Format
