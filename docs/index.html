@@ -37,20 +37,45 @@
     </section>
 
     <section class="docs-section">
-        <h2>Setting Up Google Forms</h2>
-        <p>To generate a compatible CSV, create a Google Form with the following questions:</p>
-        <ol class="steps">
-            <li><strong>Dropdown question</strong>: &ldquo;Select your name&rdquo; &mdash; add all team member names as options.</li>
-            <li>For <strong>each team member</strong>, add two questions:
-                <ul>
-                    <li><strong>Linear scale (1&ndash;9)</strong>: &ldquo;Please rate overall contribution from [Name]&rdquo;</li>
-                    <li><strong>Short answer</strong>: A justification question, e.g. &ldquo;Justify your rating for [Name]&rdquo;</li>
-                </ul>
-            </li>
-            <li>Link responses to a Google Sheet: in Google Forms, go to the <strong>Responses</strong> tab and click the Sheets icon.</li>
-            <li>When data collection is complete, export the sheet as a CSV file (see step 2 above).</li>
-        </ol>
-        <div class="tip"><strong>Tip:</strong> The justification question text doesn&rsquo;t matter &mdash; the tool simply uses the column immediately after each &ldquo;overall contribution&rdquo; column.</div>
+        <h2>Setting Up Your Form</h2>
+        <div class="tabs">
+            <div class="tab-btns" role="tablist">
+                <button class="tab-btn active" role="tab" aria-selected="true" aria-controls="tab-google" onclick="switchTab(this, 'tab-google')">Google Forms</button>
+                <button class="tab-btn" role="tab" aria-selected="false" aria-controls="tab-ms" onclick="switchTab(this, 'tab-ms')">Microsoft Forms</button>
+            </div>
+
+            <div id="tab-google" class="tab-panel active" role="tabpanel">
+                <p>Create a Google Form with the following questions:</p>
+                <ol class="steps">
+                    <li><strong>Dropdown question</strong>: &ldquo;Select your name&rdquo; &mdash; add all team member names as options.</li>
+                    <li>For <strong>each team member</strong>, add two questions:
+                        <ul>
+                            <li><strong>Linear scale (1&ndash;9)</strong>: &ldquo;Please rate overall contribution from [Name]&rdquo;</li>
+                            <li><strong>Short answer</strong>: A justification question, e.g. &ldquo;Justify your rating for [Name]&rdquo;</li>
+                        </ul>
+                    </li>
+                    <li>Link responses to a Google Sheet: in Google Forms, go to the <strong>Responses</strong> tab and click the Sheets icon.</li>
+                    <li>When data collection is complete, in Google Sheets go to <strong>File &rarr; Download &rarr; Comma Separated Values (.csv)</strong>.</li>
+                </ol>
+                <div class="tip"><strong>Tip:</strong> The justification question text doesn&rsquo;t matter &mdash; the tool uses the column immediately after each &ldquo;overall contribution&rdquo; column.</div>
+            </div>
+
+            <div id="tab-ms" class="tab-panel" role="tabpanel">
+                <p>Create a Microsoft Form at <a href="https://forms.office.com" target="_blank" rel="noopener">forms.office.com</a> with the following questions:</p>
+                <ol class="steps">
+                    <li><strong>Choice question</strong>: &ldquo;Select your name&rdquo; &mdash; add all team member names as options. Set to allow one answer (dropdown).</li>
+                    <li>For <strong>each team member</strong>, add two questions:
+                        <ul>
+                            <li><strong>Choice question</strong> with options 1, 2, 3 &hellip; 9: &ldquo;Please rate overall contribution from [Name]&rdquo;. Set to allow one answer (dropdown).</li>
+                            <li><strong>Text question</strong>: A justification question, e.g. &ldquo;Justify your rating for [Name]&rdquo;</li>
+                        </ul>
+                    </li>
+                    <li>Share the form with your team and collect responses.</li>
+                    <li>When data collection is complete, go to the <strong>Responses</strong> tab and click <strong>Open in Excel</strong>. Then in Excel go to <strong>File &rarr; Save As &rarr; CSV UTF-8 (.csv)</strong>.</li>
+                </ol>
+                <div class="tip"><strong>Tip:</strong> Use a <strong>Choice</strong> question (not Rating) for the 1&ndash;9 scores &mdash; this ensures values export as plain numbers. Include &ldquo;Select your name&rdquo; even if your form requires sign-in, as the tool uses this column to exclude self-assessments.</div>
+            </div>
+        </div>
     </section>
 
     <section class="docs-section">
@@ -114,6 +139,15 @@ Group Mean: 4.67   Median: 5</code></pre>
 </footer>
 
 <script>
+    function switchTab(btn, panelId) {
+        const tabs = btn.closest('.tabs');
+        tabs.querySelectorAll('.tab-btn').forEach(b => { b.classList.remove('active'); b.setAttribute('aria-selected', 'false'); });
+        tabs.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+        btn.classList.add('active');
+        btn.setAttribute('aria-selected', 'true');
+        document.getElementById(panelId).classList.add('active');
+    }
+
     // Only render analysed report, never raw CSV
     document.getElementById('csvFile').addEventListener('change', function(e) {
         const file = e.target.files[0];

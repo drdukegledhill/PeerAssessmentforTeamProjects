@@ -162,6 +162,48 @@ tr:nth-child(even) { background: #f8fafc; }
     margin-bottom: 0;
 }
 
+/* ── Tabs ── */
+.tabs {
+    margin-top: 0.25em;
+}
+
+.tab-btns {
+    display: flex;
+    gap: 0;
+    border-bottom: 2px solid var(--border);
+    margin-bottom: 1.25em;
+}
+
+.tab-btn {
+    background: none;
+    border: none;
+    border-bottom: 3px solid transparent;
+    margin-bottom: -2px;
+    padding: 0.6em 1.25em;
+    font-size: 0.97em;
+    font-weight: bold;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: color 0.15s, border-color 0.15s;
+}
+
+.tab-btn:hover {
+    color: var(--blue);
+}
+
+.tab-btn.active {
+    color: var(--blue);
+    border-bottom-color: var(--blue);
+}
+
+.tab-panel {
+    display: none;
+}
+
+.tab-panel.active {
+    display: block;
+}
+
 /* ── Numbered steps ── */
 .steps {
     counter-reset: steps;
