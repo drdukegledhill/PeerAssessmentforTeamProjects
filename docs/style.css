@@ -1,0 +1,8 @@
+body { font-family: Arial, sans-serif; margin: 2em; background: #f9f9f9; }
+h1 { color: #333; }
+.container { max-width: 800px; margin: auto; background: #fff; padding: 2em; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+input[type="file"] { margin-bottom: 1em; }
+table { border-collapse: collapse; width: 100%; margin-top: 1em; }
+th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+th { background: #eee; }
+tr:nth-child(even) { background: #f2f2f2; }
