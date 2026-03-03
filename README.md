@@ -1,68 +1,56 @@
 # Peer Assessment for Team Projects
 
-A Python tool for analysing peer assessment data from team projects and generating normalised scores with feedback reports.
-
-## Overview
-
-This tool processes peer assessment CSV files (typically exported from Google Forms) and produces:
-- **Normalised scores** (0-9 scale) that centre around a target median of 5
-- **Summary tables** with each student's raw and normalised scores
-- **Individual feedback** with aggregated peer comments
-
-The tool automatically detects students and adapts to any group size, excluding self-assessments from calculations.
-
-## Features
-
+A tool for analysing peer assessment data from team projects and generating normalised scores with individual feedback reports. Available as a browser-based web tool and a Python command-line script.
 
 ## Web Version
 
+The easiest way to use this tool is via the hosted web version — no installation required.
 
-A web version is now available in the `/docs` folder. It allows you to upload a CSV file and generates the same peer assessment report as the Python script: normalised scores, summary table, individual feedback, group statistics, and comments—all rendered in your browser. The web version does not display the raw CSV data; it only shows the analysed report output, matching the Python results.
+**[https://drdukegledhill.github.io/PeerAssessmentforTeamProjects/](https://drdukegledhill.github.io/PeerAssessmentforTeamProjects/)**
 
-#
-# [View Documentation](docs/index.html)
+Upload your CSV file and the report generates instantly in your browser. Your data never leaves your device.
 
-## Full Website
+## Overview
 
-[https://drdukegledhill.github.io/PeerAssessmentforTeamProjects/](https://drdukegledhill.github.io/PeerAssessmentforTeamProjects/)
+The tool processes peer assessment CSV files (exported from Google Forms or Microsoft Forms) and produces:
 
-### Usage
+- **Normalised scores** (0–9 scale) centred around a target median of 5
+- **Summary tables** with each student's raw average and normalised score
+- **Individual feedback** with aggregated peer comments
 
-1. Open `docs/index.html` in your web browser.
-2. Use the file upload button to select a CSV file.
+Students are detected automatically from column headers. Self-assessments are excluded from all calculations. The tool adapts to any group size.
 
-No backend or installation required—everything runs in your browser.
+## Setting Up Your Form
 
-## Requirements
+### Google Forms
 
-- Python 3.6+
-- No external dependencies (uses only standard library)
+1. **Dropdown question**: "Select your name" — add all team member names as options.
+2. For **each team member**, add two questions:
+   - **Linear scale (1–9)**: "Please rate overall contribution from [Name]"
+   - **Short answer**: A justification question, e.g. "Justify your rating for [Name]"
+3. Link responses to a Google Sheet: in Google Forms, go to the **Responses** tab and click the Sheets icon.
+4. Export: in Google Sheets go to **File → Download → Comma Separated Values (.csv)**.
 
-## Usage
+### Microsoft Forms
 
-```bash
-python3 pa_report.py <csv_file>
-```
+1. **Choice question**: "Select your name" — add all team member names as options (one answer, dropdown).
+2. For **each team member**, add two questions:
+   - **Choice question** with options 1, 2, 3 … 9: "Please rate overall contribution from [Name]" (one answer, dropdown)
+   - **Text question**: A justification question, e.g. "Justify your rating for [Name]"
+3. Share the form and collect responses.
+4. Export: go to the **Responses** tab → **Open in Excel**, then in Excel go to **File → Save As → CSV UTF-8 (.csv)**.
 
-### Example
-
-```bash
-python3 pa_report.py "team1.csv"
-```
+> **Tip:** Use a Choice question (not Rating) for 1–9 scores in Microsoft Forms — this ensures values export as plain numbers. In either platform, the justification question text doesn't matter; the tool uses the column immediately after each "overall contribution" column.
 
 ## CSV Format
 
-The tool expects a CSV file with the following column patterns:
-
-| Column Type | Expected Header Pattern |
+| Column type | Expected header pattern |
 |-------------|------------------------|
 | Respondent name | Contains "select your name" or "your name" |
 | Overall contribution | `Please rate [the] overall contribution from [Student Name]` |
 | Justification/Comments | Column immediately following the overall contribution column |
 
-### Example CSV
-
-For a team of 3 students (Alice, Bob, Charlie), the minimum CSV structure would be:
+### Example CSV (3 students)
 
 ```csv
 Select your name,Please rate overall contribution from Alice,Justify Alice,Please rate overall contribution from Bob,Justify Bob,Please rate overall contribution from Charlie,Justify Charlie
@@ -72,8 +60,6 @@ Charlie,8,Led the project well,7,Helpful,6,Self assessment
 ```
 
 ### Example Output
-
-Running the tool on the above CSV produces:
 
 ```
 Detected 3 students: Alice, Bob, Charlie
@@ -131,50 +117,24 @@ INDIVIDUAL FEEDBACK
 ----------------------------------------------------------------------
 ```
 
-### Google Form Setup
+## Python CLI
 
-To generate a compatible CSV, create a Google Form with the following questions:
+A command-line version is available for batch processing or scripted workflows. It produces identical output to the web tool.
 
-1. **Dropdown question**: "Select your name"
-   - Add all team member names as options
+**Requirements:** Python 3.6+, no external dependencies.
 
-2. **For each team member**, add:
-   - **Linear scale (1-9)**: "Please rate overall contribution from [Name]"
-   - **Short answer or paragraph**: A justification question (e.g., "Justify your rating for [Name]")
-
-> **Tip:** The justification question text doesn't matter — the tool simply uses the column immediately after each "overall contribution" column.
-
-### Getting CSV Data from Google Forms
-
-1. **Create a Google Form** for peer assessment with questions for each team member
-2. **Link responses to a Google Sheet**: In Google Forms, go to the "Responses" tab and click the green Sheets icon to create a linked spreadsheet
-3. **Export as CSV**: In Google Sheets, go to `File` → `Download` → `Comma Separated Values (.csv)`
-4. **Run the report**: Use the downloaded CSV file with this tool
-
-## Output
-
-The tool generates a report with:
-
-1. **Header Information**
-   - Total number of students
-   - Raw group mean score
-   - Normalisation adjustment applied
-   
-2. **Summary Table**
-   - List of all students (in original order)
-   - Raw average scores
-   - Normalised final scores (0-9)
-
-3. **Individual Feedback**
-   - Each student's final score
-   - Aggregated peer comments
+```bash
+python3 pa_report.py "team1.csv"
+```
 
 ## Normalisation
 
-Scores are normalised so that the group mean centres around 5:
-- Raw scores are adjusted by `(target - group_mean)`
-- Final scores are rounded and clamped to the 0-9 range
-- This ensures fair comparison across different teams with varying rating tendencies
+Scores are normalised so the group mean centres on 5, enabling fair comparison across teams with different rating tendencies:
+
+1. All peer scores are collected, excluding self-assessments.
+2. The group mean is calculated across all collected scores.
+3. An adjustment is applied: `normalised = raw average + (5 − group mean)`
+4. Results are rounded using **banker's rounding** (round half to even) and clamped to the 0–9 range.
 
 ## Licence
 
@@ -191,4 +151,4 @@ Under the following terms:
 
 ## Author
 
-Dr Duke Gledhill - University of Huddersfield
+Dr Duke Gledhill — University of Huddersfield
