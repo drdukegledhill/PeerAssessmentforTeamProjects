@@ -98,7 +98,7 @@ Bob,7,Very organised,5,Self assessment,7,Reliable
 Charlie,8,Led the project well,7,Helpful,6,Self assessment</code></pre>
         <h3>Example output</h3>
 <pre><code>Total students: 3
-Group mean (raw): 7.17  |  Normalisation adjustment: -2.17  |  Target median: 5
+Group median (raw): 7.50  |  Normalisation adjustment: -2.50  |  Target: 5
 
 #   Student     Raw Avg   Score
 1   Alice          7.50       5
@@ -110,11 +110,12 @@ Group Mean: 4.67   Median: 5</code></pre>
 
     <section class="docs-section">
         <h2>How Normalisation Works</h2>
-        <p>Raw peer scores are adjusted so that the group mean centres on 5, enabling fair comparison across teams with different rating tendencies (e.g. a generous team vs. a harsh team):</p>
+        <p>Raw peer scores are adjusted so that the group centres on 5, enabling fair comparison across teams with different rating tendencies (e.g. a generous team vs. a harsh team):</p>
         <ol class="steps">
             <li>All peer scores are collected, <strong>excluding self-assessments</strong> (a student&rsquo;s own rating of themselves).</li>
-            <li>The group mean is calculated across all collected scores.</li>
-            <li>An adjustment is applied: <code>normalised = raw average + (5 &minus; group mean)</code></li>
+            <li>Each student&rsquo;s raw average is calculated from the scores they received.</li>
+            <li>The <strong>median</strong> of those raw averages is used as the group reference point. The median is used rather than the mean so that one outlier student (e.g. someone who barely contributed) does not distort everyone else&rsquo;s scores.</li>
+            <li>An adjustment is applied: <code>normalised = raw average + (5 &minus; group median)</code></li>
             <li>Results are rounded using <strong>banker&rsquo;s rounding</strong> (round half to even) and clamped to the 0&ndash;9 range.</li>
         </ol>
         <div class="tip">A team that rates generously will be adjusted down; a harsh team adjusted up. Each student&rsquo;s final score reflects their standing <em>relative to their group</em>, not the group&rsquo;s absolute rating level.</div>
@@ -250,9 +251,12 @@ Group Mean: 4.67   Median: 5</code></pre>
             allScores = allScores.concat(scores);
         });
 
-        // Normalise scores
+        // Normalise scores: use median of student raw averages as the reference.
+        // The median is robust to outliers: one very low-scoring student won't
+        // pull the reference down and inflate everyone else's scores.
         const target = 5;
-        const groupMean = allScores.length ? allScores.reduce((a,b) => a+b,0)/allScores.length : 0;
+        const rawAvgValues = Object.values(rawAvgs).slice().sort((a, b) => a - b);
+        const groupMean = rawAvgValues.length ? rawAvgValues[Math.floor(rawAvgValues.length / 2)] : 0;
         const adjustment = target - groupMean;
         let normalised = {};
         function bankersRound(n) {
@@ -290,7 +294,7 @@ Group Mean: 4.67   Median: 5</code></pre>
         const studentList = Object.keys(students);
         let html = '';
         html += `<h2>Summary Statistics</h2>`;
-        html += `<p>Total students: ${studentList.length}<br>Group mean (raw): ${groupMean.toFixed(2)}<br>Normalisation adjustment: ${adjustment >= 0 ? '+' : ''}${adjustment.toFixed(2)}<br>Target median: 5</p>`;
+        html += `<p>Total students: ${studentList.length}<br>Group median (raw): ${groupMean.toFixed(2)}<br>Normalisation adjustment: ${adjustment >= 0 ? '+' : ''}${adjustment.toFixed(2)}<br>Target: 5</p>`;
 
         html += `<h2>Summary Table</h2>`;
         html += `<table><thead><tr><th>#</th><th>Student</th><th>Raw Avg</th><th>Score</th></tr></thead><tbody>`;

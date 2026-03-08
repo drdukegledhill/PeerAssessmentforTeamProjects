@@ -134,14 +134,16 @@ def normalize_scores(raw_avgs, all_scores, target=5):
         Tuple of (normalised scores dict, group_mean, adjustment value)
     """
     # Handle empty data case
-    if not all_scores:
+    if not raw_avgs:
         return {}, 0, 0
-    
-    # Calculate the overall group mean from all scores
-    group_mean = sum(all_scores) / len(all_scores)
-    
+
+    # Use the median of student raw averages as the normalisation reference.
+    # The median is robust to outliers: one very low-scoring student won't
+    # pull the reference down and inflate everyone else's scores.
+    sorted_avgs = sorted(raw_avgs.values())
+    group_mean = sorted_avgs[len(sorted_avgs) // 2]
+
     # Calculate how much to adjust scores to centre around target
-    # If group_mean is 6 and target is 5, adjustment will be -1
     adjustment = target - group_mean
     
     normalised = {}
@@ -223,9 +225,9 @@ def generate_report(students, raw_avgs, normalised, comments, group_mean, adjust
     
     # Print summary statistics
     print(f"Total students: {len(students)}")
-    print(f"Group mean (raw): {group_mean:.2f}")  # .2f formats to 2 decimal places
+    print(f"Group median (raw): {group_mean:.2f}")  # .2f formats to 2 decimal places
     print(f"Normalisation adjustment: {adjustment:+.2f}")  # +.2f shows sign (+/-)
-    print(f"Target median: 5")
+    print(f"Target: 5")
     print()
     
     # Print summary table header
