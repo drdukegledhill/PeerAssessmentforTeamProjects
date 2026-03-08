@@ -91,20 +91,21 @@ def calculate_scores(data, students, name_col):
     """
     raw_avgs = {}       # Will store each student's average score
     all_scores = []     # Collects all scores for group statistics
-    
+    non_attendees = set()  # Students who received all-zero scores from every peer
+
     # Process each student to calculate their average peer rating
     for student, cols in students.items():
         scores = []  # Scores received by this student
-        
+
         # Go through each response row
         for row in data:
             # Identify who submitted this response
             rater = row[name_col] if name_col is not None else None
-            
+
             # Skip if this is a self-assessment (student rating themselves)
             if rater == student:
                 continue
-                
+
             try:
                 # Extract the numeric score from the appropriate column
                 score = int(row[cols['overall']])
@@ -113,53 +114,61 @@ def calculate_scores(data, students, name_col):
             except (ValueError, IndexError):
                 # Skip if score is missing or not a valid number
                 pass
-        
+
         # Calculate average: sum divided by count, or 0 if no scores
         raw_avgs[student] = sum(scores) / len(scores) if scores else 0
-    
-    return raw_avgs, all_scores
+
+        # Flag students who received all-zero scores from every peer rater.
+        # These are excluded from normalisation so they don't distort group stats.
+        if scores and all(s == 0 for s in scores):
+            non_attendees.add(student)
+
+    return raw_avgs, all_scores, non_attendees
 
 
-def normalize_scores(raw_avgs, all_scores, target=5):
+def normalize_scores(raw_avgs, all_scores, target=5, non_attendees=None):
     """
-    Normalise scores so group mean centres around target value.
-    This ensures fair comparison across teams with different rating tendencies.
-    
+    Normalise scores so group median centres around target value.
+    Non-attendees (all-zero scores) are excluded from the reference calculation.
+
     Args:
         raw_avgs: Dict of raw average scores per student
-        all_scores: List of all individual scores for calculating group mean
-        target: Target value to centre the group mean around (default: 5)
-        
+        all_scores: List of all individual scores (unused, kept for compatibility)
+        target: Target value to centre the group median around (default: 5)
+        non_attendees: Set of student names to exclude from the median reference
+
     Returns:
-        Tuple of (normalised scores dict, group_mean, adjustment value)
+        Tuple of (normalised scores dict, group_median, adjustment value)
     """
+    if non_attendees is None:
+        non_attendees = set()
+
     # Handle empty data case
     if not raw_avgs:
         return {}, 0, 0
 
-    # Use the median of student raw averages as the normalisation reference.
-    # The median is robust to outliers: one very low-scoring student won't
-    # pull the reference down and inflate everyone else's scores.
-    sorted_avgs = sorted(raw_avgs.values())
-    group_mean = sorted_avgs[len(sorted_avgs) // 2]
+    # Use the median of attendee raw averages as the normalisation reference.
+    # Median is robust to outliers; non-attendees are excluded so a student
+    # who received all zeros doesn't compress the rest of the group upward.
+    attendee_avgs = [v for k, v in raw_avgs.items() if k not in non_attendees]
+    if not attendee_avgs:
+        return {k: 0 for k in raw_avgs}, 0, 0
 
-    # Calculate how much to adjust scores to centre around target
-    adjustment = target - group_mean
-    
+    sorted_avgs = sorted(attendee_avgs)
+    group_median = sorted_avgs[len(sorted_avgs) // 2]
+    adjustment = target - group_median
+
     normalised = {}
     for student, raw in raw_avgs.items():
-        # Apply the adjustment to shift scores towards target
-        norm_score = raw + adjustment
-        
-        # Round to nearest integer for final score
-        norm_score = round(norm_score)
-        
-        # Clamp score to valid range 0-9 (can't go below 0 or above 9)
-        norm_score = max(0, min(9, norm_score))
-        
-        normalised[student] = norm_score
-    
-    return normalised, group_mean, adjustment
+        if student in non_attendees:
+            normalised[student] = 0
+        else:
+            norm_score = raw + adjustment
+            norm_score = round(norm_score)
+            norm_score = max(0, min(9, norm_score))
+            normalised[student] = norm_score
+
+    return normalised, group_median, adjustment
 
 
 def extract_comments(data, students, name_col):
@@ -200,7 +209,7 @@ def extract_comments(data, students, name_col):
     return comments
 
 
-def generate_report(students, raw_avgs, normalised, comments, group_mean, adjustment, title="PEER ASSESSMENT REPORT"):
+def generate_report(students, raw_avgs, normalised, comments, group_mean, adjustment, non_attendees=None, title="PEER ASSESSMENT REPORT"):
     """
     Generate and print the full peer assessment report.
     
@@ -209,11 +218,14 @@ def generate_report(students, raw_avgs, normalised, comments, group_mean, adjust
         raw_avgs: Dict of raw average scores per student
         normalised: Dict of normalised final scores per student
         comments: Dict mapping students to their received comments
-        group_mean: The calculated group mean before normalisation
+        group_mean: The calculated group median before normalisation
         adjustment: The normalisation adjustment applied
+        non_attendees: Set of student names flagged as did-not-attend
         title: Title for the report header
     """
-    
+    if non_attendees is None:
+        non_attendees = set()
+
     # Keep students in original order from CSV (Python dicts preserve insertion order)
     student_list = list(students.keys())
     
@@ -240,13 +252,15 @@ def generate_report(students, raw_avgs, normalised, comments, group_mean, adjust
     
     # Print each student's row in the summary table
     for num, student in enumerate(student_list, 1):  # enumerate starting at 1 for numbering
-        print(f"{num:<6}{student:<30}{raw_avgs[student]:>12.2f}{normalised[student]:>12}")
+        score_display = "DNA" if student in non_attendees else str(normalised[student])
+        print(f"{num:<6}{student:<30}{raw_avgs[student]:>12.2f}{score_display:>12}")
     
     print("-" * 70)
     
-    # Calculate and display group statistics for normalised scores
-    int_mean = sum(normalised.values()) / len(normalised) if normalised else 0
-    sorted_vals = sorted(normalised.values())
+    # Calculate and display group statistics for normalised scores (excluding non-attendees)
+    attendee_scores = [v for k, v in normalised.items() if k not in non_attendees]
+    int_mean = sum(attendee_scores) / len(attendee_scores) if attendee_scores else 0
+    sorted_vals = sorted(attendee_scores)
     # Calculate median (middle value of sorted list)
     median = sorted_vals[len(sorted_vals) // 2] if sorted_vals else 0
     
@@ -264,7 +278,10 @@ def generate_report(students, raw_avgs, normalised, comments, group_mean, adjust
     for student in student_list:
         print()
         print(f">>> {student}")
-        print(f"    Score: {normalised[student]}")
+        if student in non_attendees:
+            print(f"    Score: 0 (Did not attend — excluded from group normalisation)")
+        else:
+            print(f"    Score: {normalised[student]}")
         print()
         
         # Print peer comments if any exist
@@ -323,16 +340,20 @@ def main():
     print()
     
     # Step 1: Calculate raw average scores for each student
-    raw_avgs, all_scores = calculate_scores(data, students, name_col)
-    
+    raw_avgs, all_scores, non_attendees = calculate_scores(data, students, name_col)
+
+    if non_attendees:
+        print(f"Non-attendees detected (excluded from normalisation): {', '.join(non_attendees)}")
+        print()
+
     # Step 2: Normalise scores to centre around target (default 5)
-    normalised, group_mean, adjustment = normalize_scores(raw_avgs, all_scores)
-    
+    normalised, group_mean, adjustment = normalize_scores(raw_avgs, all_scores, non_attendees=non_attendees)
+
     # Step 3: Extract peer feedback comments
     comments = extract_comments(data, students, name_col)
-    
+
     # Step 4: Generate and print the final report
-    generate_report(students, raw_avgs, normalised, comments, group_mean, adjustment)
+    generate_report(students, raw_avgs, normalised, comments, group_mean, adjustment, non_attendees=non_attendees)
 
 
 # Standard Python idiom: only run main() if this script is executed directly

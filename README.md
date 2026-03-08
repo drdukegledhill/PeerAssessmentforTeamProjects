@@ -69,9 +69,9 @@ PEER ASSESSMENT REPORT
 ======================================================================
 
 Total students: 3
-Group mean (raw): 7.17
-Normalisation adjustment: -2.17
-Target median: 5
+Group median (raw): 7.50
+Normalisation adjustment: -2.50
+Target: 5
 
 ----------------------------------------------------------------------
 SUMMARY TABLE
@@ -129,12 +129,14 @@ python3 pa_report.py "team1.csv"
 
 ## Normalisation
 
-Scores are normalised so the group mean centres on 5, enabling fair comparison across teams with different rating tendencies:
+Scores are normalised so the group centres on 5, enabling fair comparison across teams with different rating tendencies:
 
 1. All peer scores are collected, excluding self-assessments.
-2. The group mean is calculated across all collected scores.
-3. An adjustment is applied: `normalised = raw average + (5 − group mean)`
-4. Results are rounded using **banker's rounding** (round half to even) and clamped to the 0–9 range.
+2. Each student's raw average is calculated from the scores they received.
+3. Any student who received **all zeros** from every peer rater is flagged as **Did not attend (DNA)** and excluded from the normalisation reference. Their score is recorded as 0.
+4. The **median** of the remaining students' raw averages is used as the group reference point. The median is used rather than the mean so that one very low-scoring student does not distort everyone else's scores.
+5. An adjustment is applied: `normalised = raw average + (5 − group median)`
+6. Results are rounded using **banker's rounding** (round half to even) and clamped to the 0–9 range.
 
 ## Licence
 

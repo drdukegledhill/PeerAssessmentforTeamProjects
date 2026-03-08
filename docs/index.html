@@ -114,7 +114,8 @@ Group Mean: 4.67   Median: 5</code></pre>
         <ol class="steps">
             <li>All peer scores are collected, <strong>excluding self-assessments</strong> (a student&rsquo;s own rating of themselves).</li>
             <li>Each student&rsquo;s raw average is calculated from the scores they received.</li>
-            <li>The <strong>median</strong> of those raw averages is used as the group reference point. The median is used rather than the mean so that one outlier student (e.g. someone who barely contributed) does not distort everyone else&rsquo;s scores.</li>
+            <li>Any student who received <strong>all zeros</strong> from every peer rater is flagged as <strong>Did not attend (DNA)</strong> and excluded from the normalisation reference. Their score is recorded as 0.</li>
+            <li>The <strong>median</strong> of the remaining students&rsquo; raw averages is used as the group reference point. The median is used rather than the mean so that one very low-scoring student does not distort everyone else&rsquo;s scores.</li>
             <li>An adjustment is applied: <code>normalised = raw average + (5 &minus; group median)</code></li>
             <li>Results are rounded using <strong>banker&rsquo;s rounding</strong> (round half to even) and clamped to the 0&ndash;9 range.</li>
         </ol>
@@ -234,8 +235,8 @@ Group Mean: 4.67   Median: 5</code></pre>
         // Find respondent name column
         let nameCol = headers.findIndex(h => /select your name|your name/i.test(h));
 
-        // Calculate raw averages and collect all scores
-        let rawAvgs = {}, allScores = [];
+        // Calculate raw averages, collect all scores, detect non-attendees
+        let rawAvgs = {}, allScores = [], nonAttendees = new Set();
         Object.entries(students).forEach(([student, cols]) => {
             let scores = [];
             data.forEach(row => {
@@ -247,15 +248,20 @@ Group Mean: 4.67   Median: 5</code></pre>
                 }
             });
             rawAvgs[student] = scores.length ? scores.reduce((a,b) => a+b,0)/scores.length : 0;
-            // Add all peer scores (excluding self-assessment) to allScores for group mean
             allScores = allScores.concat(scores);
+            // Flag students who received all-zero scores from every peer rater
+            if (scores.length > 0 && scores.every(s => s === 0)) {
+                nonAttendees.add(student);
+            }
         });
 
-        // Normalise scores: use median of student raw averages as the reference.
-        // The median is robust to outliers: one very low-scoring student won't
-        // pull the reference down and inflate everyone else's scores.
+        // Normalise scores: use median of attendee raw averages as the reference.
+        // Non-attendees are excluded so they don't compress everyone else's scores.
         const target = 5;
-        const rawAvgValues = Object.values(rawAvgs).slice().sort((a, b) => a - b);
+        const rawAvgValues = Object.entries(rawAvgs)
+            .filter(([student]) => !nonAttendees.has(student))
+            .map(([, avg]) => avg)
+            .sort((a, b) => a - b);
         const groupMean = rawAvgValues.length ? rawAvgValues[Math.floor(rawAvgValues.length / 2)] : 0;
         const adjustment = target - groupMean;
         let normalised = {};
@@ -267,10 +273,14 @@ Group Mean: 4.67   Median: 5</code></pre>
             return (f % 2 === 0) ? f : f + 1;
         }
         Object.entries(rawAvgs).forEach(([student, raw]) => {
-            let normScore = raw + adjustment;
-            normScore = bankersRound(normScore);
-            normScore = Math.max(0, Math.min(9, normScore));
-            normalised[student] = normScore;
+            if (nonAttendees.has(student)) {
+                normalised[student] = 0;
+            } else {
+                let normScore = raw + adjustment;
+                normScore = bankersRound(normScore);
+                normScore = Math.max(0, Math.min(9, normScore));
+                normalised[student] = normScore;
+            }
         });
 
         // Extract comments
@@ -287,24 +297,28 @@ Group Mean: 4.67   Median: 5</code></pre>
         });
 
         // Render report
-        renderReport({students, rawAvgs, normalised, comments, groupMean, adjustment});
+        renderReport({students, rawAvgs, normalised, comments, groupMean, adjustment, nonAttendees});
     }
 
-    function renderReport({students, rawAvgs, normalised, comments, groupMean, adjustment}) {
+    function renderReport({students, rawAvgs, normalised, comments, groupMean, adjustment, nonAttendees}) {
         const studentList = Object.keys(students);
         let html = '';
         html += `<h2>Summary Statistics</h2>`;
         html += `<p>Total students: ${studentList.length}<br>Group median (raw): ${groupMean.toFixed(2)}<br>Normalisation adjustment: ${adjustment >= 0 ? '+' : ''}${adjustment.toFixed(2)}<br>Target: 5</p>`;
+        if (nonAttendees.size > 0) {
+            html += `<p><em>Non-attendees excluded from normalisation: ${[...nonAttendees].join(', ')}</em></p>`;
+        }
 
         html += `<h2>Summary Table</h2>`;
         html += `<table><thead><tr><th>#</th><th>Student</th><th>Raw Avg</th><th>Score</th></tr></thead><tbody>`;
         studentList.forEach((student, i) => {
-            html += `<tr><td>${i+1}</td><td>${student}</td><td>${rawAvgs[student].toFixed(2)}</td><td>${normalised[student]}</td></tr>`;
+            const scoreDisplay = nonAttendees.has(student) ? 'DNA' : normalised[student];
+            html += `<tr><td>${i+1}</td><td>${student}</td><td>${rawAvgs[student].toFixed(2)}</td><td>${scoreDisplay}</td></tr>`;
         });
         html += `</tbody></table>`;
 
-        // Group stats
-        const normVals = Object.values(normalised);
+        // Group stats — exclude non-attendees
+        const normVals = studentList.filter(s => !nonAttendees.has(s)).map(s => normalised[s]);
         const intMean = normVals.length ? normVals.reduce((a,b)=>a+b,0)/normVals.length : 0;
         const sortedVals = [...normVals].sort((a,b)=>a-b);
         let median = 0;
@@ -318,7 +332,11 @@ Group Mean: 4.67   Median: 5</code></pre>
         studentList.forEach(student => {
             html += `<div class="feedback-card">`;
             html += `<h3>${student}</h3>`;
-            html += `<p><b>Score:</b> ${normalised[student]}</p>`;
+            if (nonAttendees.has(student)) {
+                html += `<p><b>Score:</b> 0 <em>(Did not attend — excluded from group normalisation)</em></p>`;
+            } else {
+                html += `<p><b>Score:</b> ${normalised[student]}</p>`;
+            }
             if (comments[student].length) {
                 html += `<b>Peer Comments:</b><ul>`;
                 comments[student].forEach(comment => {
