@@ -5,6 +5,52 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Peer Assessment Report</title>
     <link rel="stylesheet" href="style.css">
+    <style>
+        .section-nav {
+            background: var(--white);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+        }
+        .section-nav ul {
+            display: flex;
+            gap: 0;
+            list-style: none;
+            margin: 0 auto;
+            padding: 0 1.5em;
+            max-width: 860px;
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+        .section-nav ul::-webkit-scrollbar { display: none; }
+        .section-nav li { flex-shrink: 0; }
+        .section-nav a {
+            display: block;
+            padding: 0.65em 1em;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.88em;
+            font-weight: bold;
+            border-bottom: 3px solid transparent;
+            white-space: nowrap;
+            transition: color 0.15s, border-color 0.15s;
+        }
+        .section-nav a:hover { color: var(--blue); }
+        .section-nav a.active { color: var(--blue); border-bottom-color: var(--blue); }
+        .back-to-top {
+            display: block;
+            text-align: right;
+            font-size: 0.82em;
+            color: var(--text-muted);
+            text-decoration: none;
+            margin-top: 1em;
+            padding-top: 0.5em;
+            border-top: 1px solid var(--border);
+        }
+        .back-to-top:hover { color: var(--blue); }
+    </style>
 </head>
 <body>
 
@@ -14,6 +60,18 @@
         <p class="subtitle">Upload a peer assessment CSV to instantly generate normalised scores and individual feedback - everything runs in your browser, no data is uploaded anywhere.</p>
     </div>
 </header>
+
+<nav class="section-nav" aria-label="Page sections">
+    <ul>
+        <li><a href="#section=how-to-use" data-section="how-to-use">How to Use</a></li>
+        <li><a href="#section=setup" data-section="setup">Setting Up</a></li>
+        <li><a href="#section=csv-format" data-section="csv-format">CSV Format</a></li>
+        <li><a href="#section=normalisation" data-section="normalisation">Normalisation</a></li>
+        <li><a href="#section=rationale" data-section="rationale">Rationale</a></li>
+        <li><a href="#section=simulator" data-section="simulator">Simulator</a></li>
+        <li><a href="#section=python-cli" data-section="python-cli">Python CLI</a></li>
+    </ul>
+</nav>
 
 <div class="container">
 
@@ -25,7 +83,7 @@
 
     <div id="output"></div>
 
-    <section class="docs-section">
+    <section class="docs-section" id="how-to-use">
         <h2>How to Use</h2>
         <ol class="steps">
             <li>Set up a peer assessment form using any tool that supports CSV export (see <em>Setting Up Your Form</em> below) and collect responses.</li>
@@ -34,9 +92,10 @@
             <li>The report generates instantly - normalised scores, summary table, and individual feedback with peer comments.</li>
         </ol>
         <div class="tip">No installation required. Your data never leaves your browser - all processing happens on your device.</div>
+        <a href="#" class="back-to-top">Back to top</a>
     </section>
 
-    <section class="docs-section">
+    <section class="docs-section" id="setup">
         <h2>Setting Up Your Form</h2>
         <div class="tabs">
             <div class="tab-btns" role="tablist">
@@ -76,9 +135,10 @@
                 <div class="tip"><strong>Tip:</strong> Use a <strong>Choice</strong> question (not Rating) for the 1&ndash;9 scores - this ensures values export as plain numbers. Include &ldquo;Select your name&rdquo; even if your form requires sign-in, as the tool uses this column to exclude self-assessments.</div>
             </div>
         </div>
+        <a href="#" class="back-to-top">Back to top</a>
     </section>
 
-    <section class="docs-section">
+    <section class="docs-section" id="csv-format">
         <h2>CSV Format</h2>
         <p>Students are detected automatically from the column headers. The tool looks for these patterns:</p>
         <table>
@@ -106,9 +166,10 @@ Group median (raw): 7.50  |  Normalisation adjustment: -2.50  |  Target: 5
 3   Charlie        6.50       4
 
 Group Mean: 4.67   Median: 5</code></pre>
+        <a href="#" class="back-to-top">Back to top</a>
     </section>
 
-    <section class="docs-section">
+    <section class="docs-section" id="normalisation">
         <h2>How Normalisation Works</h2>
         <p>Raw peer scores are adjusted so that the group centres on 5, enabling fair comparison across teams with different rating tendencies (e.g. a generous team vs. a harsh team):</p>
         <ol class="steps">
@@ -120,9 +181,10 @@ Group Mean: 4.67   Median: 5</code></pre>
             <li>Results are rounded using <strong>banker&rsquo;s rounding</strong> (round half to even) and clamped to the 0&ndash;9 range.</li>
         </ol>
         <div class="tip">A team that rates generously will be adjusted down; a harsh team adjusted up. Each student&rsquo;s final score reflects their standing <em>relative to their group</em>, not the group&rsquo;s absolute rating level.</div>
+        <a href="#" class="back-to-top">Back to top</a>
     </section>
 
-    <section class="docs-section">
+    <section class="docs-section" id="rationale">
         <h2>Why are scores normalised - and is it fair?</h2>
 
             <h3>What the system actually measures</h3>
@@ -192,19 +254,22 @@ Group Mean: 4.67   Median: 5</code></pre>
             </div>
 
             <div class="rationale-callout">The key question to ask when rating: compared to what an average member of this team contributed, did this person contribute more, the same, or less? A score of 5 means average for your team. The numbers you give only matter relative to each other - not in absolute terms.</div>
+        <a href="#" class="back-to-top">Back to top</a>
     </section>
 
-    <section class="docs-section">
+    <section class="docs-section" id="simulator">
         <h2>Normalisation Simulator</h2>
         <p>Want to understand how normalisation works? Use the interactive simulator to enter your team members' names, adjust ratings with sliders, and watch the normalised scores update in real time.</p>
         <p><a href="simulator.html"><strong>Open the simulator &rarr;</strong></a></p>
+        <a href="#" class="back-to-top">Back to top</a>
     </section>
 
-    <section class="docs-section">
+    <section class="docs-section" id="python-cli">
         <h2>Python CLI Version</h2>
         <p>A command-line version is also available for batch processing or scripted workflows. It produces identical output to this web tool and requires only Python 3.6+ with no external dependencies.</p>
         <pre><code>python3 pa_report.py "team1.csv"</code></pre>
         <p>Download from the <a href="https://github.com/drdukegledhill/PeerAssessmentforTeamProjects" target="_blank" rel="noopener">GitHub repository</a>.</p>
+        <a href="#" class="back-to-top">Back to top</a>
     </section>
 
 </div>
@@ -219,6 +284,60 @@ Group Mean: 4.67   Median: 5</code></pre>
 </footer>
 
 <script>
+    // Section navigation: hash deep-linking and scroll-spy
+    const sectionIds = ['how-to-use', 'setup', 'csv-format', 'normalisation', 'rationale', 'simulator', 'python-cli'];
+
+    function activateNavLink(sectionId) {
+        document.querySelectorAll('.section-nav a[data-section]').forEach(a => {
+            a.classList.toggle('active', a.dataset.section === sectionId);
+        });
+    }
+
+    function scrollToSection(sectionId) {
+        const el = document.getElementById(sectionId);
+        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    document.querySelectorAll('.section-nav a[data-section]').forEach(a => {
+        a.addEventListener('click', e => {
+            e.preventDefault();
+            const sectionId = a.dataset.section;
+            history.pushState(null, '', '#section=' + sectionId);
+            scrollToSection(sectionId);
+            activateNavLink(sectionId);
+        });
+    });
+
+    function handleHash() {
+        const hash = location.hash;
+        if (hash.startsWith('#section=')) {
+            const sectionId = hash.slice(9);
+            if (sectionIds.includes(sectionId)) {
+                scrollToSection(sectionId);
+                activateNavLink(sectionId);
+            }
+        }
+    }
+
+    window.addEventListener('load', handleHash);
+    window.addEventListener('hashchange', handleHash);
+
+    // Scroll-spy: highlight nav link for the most visible section
+    const scrollObserver = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const id = entry.target.id;
+                history.replaceState(null, '', '#section=' + id);
+                activateNavLink(id);
+            }
+        });
+    }, { threshold: 0.3 });
+
+    sectionIds.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) scrollObserver.observe(el);
+    });
+
     function switchTab(btn, panelId) {
         const tabs = btn.closest('.tabs');
         tabs.querySelectorAll('.tab-btn').forEach(b => { b.classList.remove('active'); b.setAttribute('aria-selected', 'false'); });
