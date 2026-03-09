@@ -143,9 +143,9 @@ Scores are normalised so the group centres on 5, enabling fair comparison across
 
 ### What the system actually measures
 
-This tool does not ask students to grade peers in the way a lecturer grades an essay. It asks them to rank relative contribution within their team (Conway et al., 1993; Falchikov & Goldfinch, 2000). The scale from 1 to 9 has no fixed external meaning - a "6" does not mean "this person did 60% of the work." What matters is how the ratings relate to each other: giving Alice a 7 and Bob a 5 says Alice contributed roughly 40% more than Bob, relative to the team.
+This tool does not ask students to grade peers in the way a lecturer grades an essay. It asks them to rank relative contribution within their team (Conway et al., 1993; Falchikov & Goldfinch, 2000) - a valid pedagogical approach when students have worked closely enough to observe each other's contributions (Boud et al., 1999). The scale from 1 to 9 has no fixed external meaning - a "6" does not mean "this person did 60% of the work." What matters is how the ratings relate to each other: giving Alice a 7 and Bob a 5 says Alice contributed roughly 40% more than Bob, relative to the team.
 
-Because the numbers have no fixed external meaning, the system cannot simply use them as-is.
+Because the numbers have no fixed external meaning, the system cannot simply use them as-is. The peer comments students provide alongside their ratings are not an afterthought - giving structured feedback on a colleague's contribution is itself a learning activity (Liu & Carless, 2006).
 
 > Conway, R., Kember, D., Sivan, A., & Wu, M. (1993). Peer assessment of an individual's contribution to a group project. *Assessment & Evaluation in Higher Education, 18*(1), 45–56. https://doi.org/10.1080/0260293930180105 - Directly supports the relative contribution model: peer ratings as rankings within a team rather than absolute grades.
 >
@@ -180,7 +180,9 @@ Multiple peers rated that person, and their raw average across all peer ratings 
 
 **"I gave someone a 2 and they ended up with a 0 - why?"**
 
-A rating of 2 on a 1 to 9 scale is a very low relative assessment - it signals serious concern about contribution. When the group median is above 5, the downward adjustment can push a raw average of 2 below zero, which is clamped to 0. The system is not inventing a punishment; it is faithfully reflecting that this student was rated very poorly relative to the team norm.
+A rating of 2 on a 1 to 9 scale is a very low relative assessment - it signals serious concern about contribution. When the group median is above 5, the downward adjustment can push a raw average of 2 below zero, which is clamped to 0. This is a direct consequence of the normalisation formula: the same group-level adjustment that protects well-contributing students from generous rating cultures will push already very low scores further down (Lejk & Wyvill, 2001). The system is not inventing a punishment; it is faithfully reflecting that this student was rated very poorly relative to the team norm.
+
+> Lejk, M., & Wyvill, M. (2001). The effect of the inclusion of self-assessment with peer assessment of contributions to a group project: A quantitative study of secret and agreed assessments. *Assessment & Evaluation in Higher Education, 26*(6), 551–561. https://doi.org/10.1080/02602930120093728 - Examines how group-level normalisation adjustments affect individual scores across the distribution, including for low-scoring students.
 
 **"What if we all agree to give everyone a 6 or 7?"**
 
@@ -194,7 +196,9 @@ This is not a bug - it is a core feature. The system is resistant to collusion. 
 
 **"One person gave me a really low score - doesn't that drag my average down unfairly?"**
 
-Your raw average is calculated across all peer ratings you received. With a typical group of four or five students, one extreme score has limited influence. If three peers rate you at 7 and one rates you at 2, your raw average is 5.75 - noticeably lower than if that rater had given 6, but not catastrophic. The more raters there are, the more resilient the system is to any single outlier. If you believe a rating was submitted maliciously rather than honestly, that is a matter to raise directly with your lecturer - but the system does not remove outliers automatically, because doing so would itself create opportunities for gaming (for example, a group agreeing to all rate one person low in order to trigger removal).
+Your raw average is calculated across all peer ratings you received. With a typical group of four or five students, one extreme score has limited influence. If three peers rate you at 7 and one rates you at 2, your raw average is 5.75 - noticeably lower than if that rater had given 6, but not catastrophic. Aggregating multiple independent peer ratings is precisely what makes the system more reliable than any single judgement (Falchikov & Goldfinch, 2000). The more raters there are, the more resilient the system is to any single outlier. If you believe a rating was submitted maliciously rather than honestly, that is a matter to raise directly with your lecturer - but the system does not remove outliers automatically, because doing so would itself create opportunities for gaming (for example, a group agreeing to all rate one person low in order to trigger removal).
+
+> Falchikov, N., & Goldfinch, J. (2000). Student peer assessment in higher education: A meta-analysis comparing peer and teacher marks. *Review of Educational Research, 70*(3), 287–322. https://doi.org/10.3102/00346543070003287 - Meta-analytic evidence that aggregated peer ratings are substantially more reliable than individual peer judgements, and that reliability increases with the number of raters.
 
 **"I was ill and missed a session - will I be flagged as DNA?"**
 
@@ -210,7 +214,11 @@ The median is used rather than the arithmetic mean because it is robust to outli
 
 ### Why scores sometimes round unexpectedly - banker's rounding
 
-Final scores are rounded using banker's rounding (round half to even) rather than the familiar "always round 0.5 up" rule. Under standard rounding, 4.5 rounds to 5 and 5.5 rounds to 6 - but so does 6.5, 7.5, and so on, introducing a small but consistent upward bias across a dataset. Banker's rounding instead rounds half-values to the nearest even integer: 4.5 rounds to 4, 5.5 rounds to 6, 6.5 rounds to 6, 7.5 rounds to 8. Over many scores, upward and downward roundings balance out, and no student benefits systematically from where their score happens to land relative to a 0.5 boundary. This is the rounding standard used in finance and scientific computing (IEEE 754) for exactly this reason.
+Final scores are rounded using banker's rounding (round half to even) rather than the familiar "always round 0.5 up" rule. Under standard rounding, 4.5 rounds to 5 and 5.5 rounds to 6 - but so does 6.5, 7.5, and so on, introducing a small but consistent upward bias across a dataset. Banker's rounding instead rounds half-values to the nearest even integer: 4.5 rounds to 4, 5.5 rounds to 6, 6.5 rounds to 6, 7.5 rounds to 8. Over many scores, upward and downward roundings balance out, and no student benefits systematically from where their score happens to land relative to a 0.5 boundary. This is the default rounding mode in IEEE floating-point arithmetic (IEEE, 2008) and is recommended for its statistical neutrality across large datasets (Knuth, 1997).
+
+> IEEE. (2008). *IEEE standard for floating-point arithmetic* (IEEE Std 754-2008). IEEE. https://doi.org/10.1109/IEEESTD.2008.4610935 - The technical standard that defines round-to-nearest-even (banker's rounding) as the default rounding mode for floating-point operations, on the grounds that it avoids systematic bias over repeated rounding.
+>
+> Knuth, D. E. (1997). *The art of computer programming, Vol. 2: Seminumerical algorithms* (3rd ed.). Addison-Wesley. - Section 4.2.2 analyses rounding modes and demonstrates that round-to-even minimises cumulative rounding error across large sets of numerical values.
 
 > The key question to ask when rating: compared to what an average member of this team contributed, did this person contribute more, the same, or less? A score of 5 means average for the team. The numbers only matter relative to each other - not in absolute terms.
 
