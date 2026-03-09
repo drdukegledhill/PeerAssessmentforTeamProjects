@@ -4,7 +4,7 @@ A tool for analysing peer assessment data from team projects and generating norm
 
 ## Web Version
 
-The easiest way to use this tool is via the hosted web version — no installation required.
+The easiest way to use this tool is via the hosted web version - no installation required.
 
 **[https://drdukegledhill.github.io/PeerAssessmentforTeamProjects/](https://drdukegledhill.github.io/PeerAssessmentforTeamProjects/)**
 
@@ -25,7 +25,7 @@ Students are detected automatically from column headers. Self-assessments are ex
 
 ### Google Forms
 
-1. **Dropdown question**: "Select your name" — add all team member names as options.
+1. **Dropdown question**: "Select your name" - add all team member names as options.
 2. For **each team member**, add two questions:
    - **Linear scale (1–9)**: "Please rate overall contribution from [Name]"
    - **Short answer**: A justification question, e.g. "Justify your rating for [Name]"
@@ -34,14 +34,14 @@ Students are detected automatically from column headers. Self-assessments are ex
 
 ### Microsoft Forms
 
-1. **Choice question**: "Select your name" — add all team member names as options (one answer, dropdown).
+1. **Choice question**: "Select your name" - add all team member names as options (one answer, dropdown).
 2. For **each team member**, add two questions:
    - **Choice question** with options 1, 2, 3 … 9: "Please rate overall contribution from [Name]" (one answer, dropdown)
    - **Text question**: A justification question, e.g. "Justify your rating for [Name]"
 3. Share the form and collect responses.
 4. Export: go to the **Responses** tab → **Open in Excel**, then in Excel go to **File → Save As → CSV UTF-8 (.csv)**.
 
-> **Tip:** Use a Choice question (not Rating) for 1–9 scores in Microsoft Forms — this ensures values export as plain numbers. In either platform, the justification question text doesn't matter; the tool uses the column immediately after each "overall contribution" column.
+> **Tip:** Use a Choice question (not Rating) for 1–9 scores in Microsoft Forms - this ensures values export as plain numbers. In either platform, the justification question text doesn't matter; the tool uses the column immediately after each "overall contribution" column.
 
 ## CSV Format
 
@@ -183,14 +183,14 @@ The median is used rather than the arithmetic mean because it is robust to outli
 This work is licensed under the [Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License](https://creativecommons.org/licenses/by-nc-sa/4.0/).
 
 You are free to:
-- **Share** — copy and redistribute the material in any medium or format
-- **Adapt** — remix, transform, and build upon the material
+- **Share**: copy and redistribute the material in any medium or format
+- **Adapt**: remix, transform, and build upon the material
 
 Under the following terms:
-- **Attribution** — You must give appropriate credit, provide a link to the licence, and indicate if changes were made.
-- **NonCommercial** — You may not use the material for commercial purposes.
-- **ShareAlike** — If you remix, transform, or build upon the material, you must distribute your contributions under the same licence.
+- **Attribution**: you must give appropriate credit, provide a link to the licence, and indicate if changes were made.
+- **NonCommercial**: you may not use the material for commercial purposes.
+- **ShareAlike**: if you remix, transform, or build upon the material, you must distribute your contributions under the same licence.
 
 ## Author
 
-Dr Duke Gledhill — University of Huddersfield
+Dr Duke Gledhill, University of Huddersfield
