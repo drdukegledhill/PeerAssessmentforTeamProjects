@@ -20,6 +20,7 @@ The tool processes peer assessment CSV files (exported from Google Forms or Micr
 - **Summary tables** with each student's raw average and normalised score
 - **Individual feedback** with aggregated peer comments
 - **Did Not Attend (DNA)** detection: students who receive all zeros from every peer rater are flagged and excluded from the normalisation reference
+- **Extra rating dimensions** (optional): any additional numeric columns in the CSV that mention a student's name are detected automatically, displayed alongside the main score (rounded using banker's rounding), and clearly labelled as not used in the normalisation calculation
 
 Students are detected automatically from column headers. Self-assessments are excluded from all calculations. The tool adapts to any group size.
 
@@ -44,6 +45,8 @@ Students are detected automatically from column headers. Self-assessments are ex
 4. Export: go to the **Responses** tab → **Open in Excel**, then in Excel go to **File → Save As → CSV UTF-8 (.csv)**.
 
 > **Tip:** Use a Choice question (not Rating) for 1–9 scores in Microsoft Forms - this ensures values export as plain numbers. In either platform, the justification question text doesn't matter; the tool uses the column immediately after each "overall contribution" column.
+>
+> **Optional extra dimensions:** You can add additional numeric rating questions for each student (e.g. "Please rate Alice level of engagement" with options 1–9). The tool detects these automatically - any numeric column whose header contains a student's name is treated as an extra dimension, displayed in the report but not used in the normalisation calculation.
 
 ## CSV Format
 
@@ -52,71 +55,83 @@ Students are detected automatically from column headers. Self-assessments are ex
 | Respondent name | Contains "select your name" or "your name" |
 | Overall contribution | `Please rate [the] overall contribution from [Student Name]` |
 | Justification/Comments | Column immediately following the overall contribution column |
+| Extra rating dimensions (optional) | Any other column whose header contains a student's name - e.g. "Please rate Alice level of engagement". Detected automatically; displayed but not used in normalisation. |
 
 ### Example CSV (3 students)
 
 ```csv
-Select your name,Please rate overall contribution from Alice,Justify Alice,Please rate overall contribution from Bob,Justify Bob,Please rate overall contribution from Charlie,Justify Charlie
-Alice,7,Self assessment,8,Great teamwork,6,Could communicate more
-Bob,7,Very organised,5,Self assessment,7,Reliable
-Charlie,8,Led the project well,7,Helpful,6,Self assessment
+Select your name,Please rate overall contribution from Alice,Justify Alice,Please rate Alice level of engagement,Please rate overall contribution from Bob,Justify Bob,Please rate Bob level of engagement,Please rate overall contribution from Charlie,Justify Charlie,Please rate Charlie level of engagement
+Alice,7,Self assessment,7,8,Great teamwork,8,6,Could communicate more,5
+Bob,7,Very organised,7,5,Self assessment,5,7,Reliable,7
+Charlie,8,Led the project well,9,7,Helpful,6,6,Self assessment,6
 ```
+
+The "level of engagement" columns are optional extra dimensions. They will be detected automatically, displayed in the report, but not used in the normalisation calculation.
 
 ### Example Output
 
 ```
 Detected 3 students: Alice, Bob, Charlie
 
-======================================================================
+====================================================================
 PEER ASSESSMENT REPORT
-======================================================================
+====================================================================
 
 Total students: 3
 Group median (raw):           7.50
 Normalisation adjustment:    -2.50
 Target:                       5
 
-----------------------------------------------------------------------
+----------------------------------------------------------------
 SUMMARY TABLE
-----------------------------------------------------------------------
-#     Student                          Raw Avg     Score
-----------------------------------------------------------------------
-1     Alice                               7.50         5
-2     Bob                                 7.50         5
-3     Charlie                             6.50         4
-----------------------------------------------------------------------
+----------------------------------------------------------------
+Student                          Raw Avg     Score  engagement
+----------------------------------------------------------------
+Alice                               7.50         5           8
+Bob                                 7.50         5           6
+Charlie                             6.50         4           6
+----------------------------------------------------------------
 Group median (normalised):                           5
 
-======================================================================
+====================================================================
 INDIVIDUAL FEEDBACK
-======================================================================
+====================================================================
 
 >>> Alice
     Score: 5
+
+    Extra scores (not used in calculations):
+      level of engagement: 8
 
     Peer Comments:
     - Very organised
     - Led the project well
 
-----------------------------------------------------------------------
+--------------------------------------------------------------------
 
 >>> Bob
     Score: 5
+
+    Extra scores (not used in calculations):
+      level of engagement: 6
 
     Peer Comments:
     - Great teamwork
     - Helpful
 
-----------------------------------------------------------------------
+--------------------------------------------------------------------
 
 >>> Charlie
     Score: 4
+
+    Extra scores (not used in calculations):
+      level of engagement: 6
 
     Peer Comments:
     - Could communicate more
     - Reliable
 
-----------------------------------------------------------------------
+--------------------------------------------------------------------
 ```
 
 ## Python CLI
@@ -139,6 +154,18 @@ Scores are normalised so the group centres on 5, enabling fair comparison across
 4. The **median** of the remaining students' raw averages is used as the group reference point. The median is used rather than the mean so that one very low-scoring student does not distort everyone else's scores.
 5. An adjustment is applied: `normalised = raw average + (5 − group median)`
 6. Results are rounded using **banker's rounding** (round half to even) and clamped to the 0–9 range.
+
+## Extra Rating Dimensions
+
+If your form includes additional numeric rating questions for each student - for example, "Please rate Alice level of engagement" or "Please rate Bob communication" - these are detected automatically from the CSV headers. Any column whose header contains a student's name and is not the main overall contribution column or its justification column is treated as an extra dimension.
+
+Extra dimension scores are:
+- **Averaged** across all peer raters (excluding self-assessment)
+- **Rounded** using banker's rounding and clamped to 0–9, the same as the main score
+- **Displayed** in the summary table under a clearly labelled group header and in each student's individual feedback
+- **Not used** in the normalisation calculation - they have no effect on the final Score
+
+The label shown in the report is derived by stripping the student's name (and common lead-in phrases like "Please rate") from the column header. "Please rate Alice level of engagement" becomes "level of engagement".
 
 ## Pedagogical Rationale
 

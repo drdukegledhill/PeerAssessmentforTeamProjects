@@ -38,20 +38,21 @@ def extract_students_and_columns(headers):
     """
     Parse headers to find all students and their column indices.
     Looks for pattern: "Please rate X overall contribution" to identify students.
-    
+    Also detects any additional numeric rating columns that mention a student's name.
+
     Args:
         headers: List of column header strings from the CSV
-        
+
     Returns:
         Tuple of (students dict mapping names to column indices, name_col index)
     """
     students = {}
-    
+
     # Create regex pattern to match "Please rate [the] overall contribution from [Name]"
     # The (?:the )? makes "the " optional (non-capturing group)
     # (.+) captures the student name
     overall_pattern = re.compile(r"Please rate (?:the )?overall contribution from (.+)", re.IGNORECASE)
-    
+
     # Iterate through all headers to find student contribution columns
     for i, header in enumerate(headers):
         match = overall_pattern.search(header)
@@ -63,8 +64,9 @@ def extract_students_and_columns(headers):
             students[name] = {
                 'overall': i,           # Column index for overall contribution score
                 'justification': i + 1,  # Justification/comment column follows immediately
+                'extra': [],            # Additional rating columns for this student
             }
-    
+
     # Find the column where respondents identify themselves
     # This is needed to exclude self-assessments from calculations
     name_col = None
@@ -73,29 +75,57 @@ def extract_students_and_columns(headers):
         if 'select your name' in header.lower() or 'your name' in header.lower():
             name_col = i
             break  # Stop once we find the name column
-    
+
+    # Build set of already-claimed column indices so we don't double-count
+    taken = set()
+    for cols in students.values():
+        taken.add(cols['overall'])
+        taken.add(cols['justification'])
+    if name_col is not None:
+        taken.add(name_col)
+
+    # For each student, scan remaining headers for any that contain their name.
+    # These are treated as additional rating dimensions (e.g. "level of engagement").
+    for name, cols in students.items():
+        name_pattern = re.compile(re.escape(name) + r"'?s?\s*", re.IGNORECASE)
+        for j, header in enumerate(headers):
+            if j in taken:
+                continue
+            if name.lower() in header.lower():
+                # Derive a short label by stripping the name and common lead-in
+                label = name_pattern.sub('', header).strip()
+                label = re.sub(r'^\s*please\s+rate\s*', '', label, flags=re.IGNORECASE).strip()
+                label = re.sub(r'^[\s\-\u2013\u2014:]+', '', label).strip()
+                if not label:
+                    label = header
+                cols['extra'].append({'col': j, 'label': label})
+                taken.add(j)
+
     return students, name_col
 
 
 def calculate_scores(data, students, name_col):
     """
     Calculate raw averages for each student (excluding self-assessment).
-    
+    Also computes averages for any extra rating columns detected in the CSV.
+
     Args:
         data: List of data rows from the CSV
         students: Dict mapping student names to their column indices
         name_col: Column index where respondent identifies themselves
-        
+
     Returns:
-        Tuple of (raw_avgs dict, all_scores list)
+        Tuple of (raw_avgs dict, all_scores list, non_attendees set, extra_avgs dict)
     """
     raw_avgs = {}       # Will store each student's average score
     all_scores = []     # Collects all scores for group statistics
     non_attendees = set()  # Students who received all-zero scores from every peer
+    extra_avgs = {}     # {student: {label: average}} for additional rating columns
 
     # Process each student to calculate their average peer rating
     for student, cols in students.items():
         scores = []  # Scores received by this student
+        extra_scores = {ec['label']: [] for ec in cols.get('extra', [])}
 
         # Go through each response row
         for row in data:
@@ -115,6 +145,14 @@ def calculate_scores(data, students, name_col):
                 # Skip if score is missing or not a valid number
                 pass
 
+            # Collect scores for any extra rating columns
+            for ec in cols.get('extra', []):
+                try:
+                    s = int(row[ec['col']])
+                    extra_scores[ec['label']].append(s)
+                except (ValueError, IndexError):
+                    pass
+
         # Calculate average: sum divided by count, or 0 if no scores
         raw_avgs[student] = sum(scores) / len(scores) if scores else 0
 
@@ -123,7 +161,12 @@ def calculate_scores(data, students, name_col):
         if scores and all(s == 0 for s in scores):
             non_attendees.add(student)
 
-    return raw_avgs, all_scores, non_attendees
+        extra_avgs[student] = {
+            label: max(0, min(9, round(sum(vals) / len(vals)))) if vals else 0
+            for label, vals in extra_scores.items()
+        }
+
+    return raw_avgs, all_scores, non_attendees, extra_avgs
 
 
 def normalize_scores(raw_avgs, all_scores, target=5, non_attendees=None):
@@ -204,7 +247,7 @@ def extract_comments(data, students, name_col):
 
 def generate_report(students, raw_avgs, normalised, comments,
                     group_median, adjustment,
-                    non_attendees=None, title="PEER ASSESSMENT REPORT"):
+                    non_attendees=None, extra_avgs=None, title="PEER ASSESSMENT REPORT"):
     """
     Generate and print the full peer assessment report.
 
@@ -216,16 +259,29 @@ def generate_report(students, raw_avgs, normalised, comments,
         group_median: The group median of raw averages used for normalisation
         adjustment: The normalisation adjustment applied
         non_attendees: Set of student names flagged as did-not-attend
+        extra_avgs: Dict of {student: {label: avg}} for additional rating columns
         title: Title for the report header
     """
     if non_attendees is None:
         non_attendees = set()
+    if extra_avgs is None:
+        extra_avgs = {}
 
     student_list = list(students.keys())
 
-    print("=" * 70)
+    # Determine extra column labels from the first student (consistent across all)
+    extra_labels = []
+    if students:
+        first_cols = next(iter(students.values()))
+        extra_labels = [ec['label'] for ec in first_cols.get('extra', [])]
+
+    # Compute total width: base columns (32+12+10=54) + 12 chars per extra column
+    base_width = 64
+    table_width = base_width + 12 * len(extra_labels)
+
+    print("=" * table_width)
     print(title)
-    print("=" * 70)
+    print("=" * table_width)
     print()
 
     print(f"Total students: {len(students)}")
@@ -234,18 +290,25 @@ def generate_report(students, raw_avgs, normalised, comments,
     print(f"Target:                      5")
     print()
 
-    # Summary table
-    print("-" * 70)
+    # Summary table header
+    print("-" * table_width)
     print("SUMMARY TABLE")
-    print("-" * 70)
-    print(f"{'#':<6}{'Student':<32}{'Raw Avg':>12}{'Score':>10}")
-    print("-" * 70)
+    print("-" * table_width)
+    header = f"{'Student':<32}{'Raw Avg':>12}{'Score':>10}"
+    for lbl in extra_labels:
+        header += f"{lbl[:10]:>12}"
+    print(header)
+    print("-" * table_width)
 
-    for num, student in enumerate(student_list, 1):
+    for student in student_list:
         score_display = "DNA" if student in non_attendees else str(normalised[student])
-        print(f"{num:<6}{student:<32}{raw_avgs[student]:>12.2f}{score_display:>10}")
+        row = f"{student:<32}{raw_avgs[student]:>12.2f}{score_display:>10}"
+        for lbl in extra_labels:
+            avg = extra_avgs.get(student, {}).get(lbl, 0)
+            row += f"{avg:>12}"
+        print(row)
 
-    print("-" * 70)
+    print("-" * table_width)
 
     # Group stats for normalised scores (excluding non-attendees)
     att = [v for k, v in normalised.items() if k not in non_attendees]
@@ -266,6 +329,14 @@ def generate_report(students, raw_avgs, normalised, comments,
             print(f"    Score: 0 (Did not attend - excluded from group normalisation)")
         else:
             print(f"    Score: {normalised[student]}")
+
+        if extra_labels:
+            print()
+            print("    Extra scores (not used in calculations):")
+            for lbl in extra_labels:
+                avg = extra_avgs.get(student, {}).get(lbl, 0)
+                print(f"      {lbl}: {avg}")
+
         print()
 
         if comments[student]:
@@ -322,7 +393,7 @@ def main():
     print()
     
     # Step 1: Calculate raw average scores for each student
-    raw_avgs, all_scores, non_attendees = calculate_scores(data, students, name_col)
+    raw_avgs, all_scores, non_attendees, extra_avgs = calculate_scores(data, students, name_col)
 
     if non_attendees:
         print(f"Non-attendees detected (excluded from normalisation): {', '.join(non_attendees)}")
@@ -337,7 +408,7 @@ def main():
     # Step 4: Generate and print the final report
     generate_report(students, raw_avgs, normalised, comments,
                     group_median, adjustment,
-                    non_attendees=non_attendees)
+                    non_attendees=non_attendees, extra_avgs=extra_avgs)
 
 
 # Standard Python idiom: only run main() if this script is executed directly
