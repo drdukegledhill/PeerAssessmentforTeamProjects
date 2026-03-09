@@ -139,6 +139,45 @@ Scores are normalised so the group centres on 5, enabling fair comparison across
 5. An adjustment is applied: `normalised = raw average + (5 − group median)`
 6. Results are rounded using **banker's rounding** (round half to even) and clamped to the 0–9 range.
 
+## Pedagogical Rationale
+
+### What the system actually measures
+
+This tool does not ask students to grade peers in the way a lecturer grades an essay. It asks them to rank relative contribution within their team. The scale from 1 to 9 has no fixed external meaning - a "6" does not mean "this person did 60% of the work." What matters is how the ratings relate to each other: giving Alice a 7 and Bob a 5 says Alice contributed roughly 40% more than Bob, relative to the team.
+
+Because the numbers have no fixed external meaning, the system cannot simply use them as-is.
+
+### Why normalisation is necessary
+
+Imagine two teams sitting the same group project:
+
+- **Team A** rates generously - they give each other 7s and 8s because everyone worked hard and they feel positive about it.
+- **Team B** rates harshly - they give 4s and 5s because they hold each other to a high standard.
+
+Without normalisation, a student in Team A would receive a much higher score than an equally contributing student in Team B - not because they did more work, but because their teammates were kinder with the scale. Normalisation adjusts each team's scores so they centre on the same reference point (5), making scores comparable across teams with different rating cultures.
+
+### Common student concerns
+
+**"I gave someone a 6 and they ended up with a 4 - why?"**
+
+Multiple peers rated that person, and their raw average across all peer ratings was calculated (excluding self-assessment). If they received a 6 from one rater but lower scores from others, their raw average was pulled down by those other ratings. And if the team's median was above 5 - because the team rated generously overall - the adjustment brought scores down further. Each individual rating is one honest data point; the result reflects what the group collectively observed, corrected for the team's rating tendencies.
+
+**"I gave someone a 2 and they ended up with a 0 - why?"**
+
+A rating of 2 on a 1 to 9 scale is a very low relative assessment - it signals serious concern about contribution. When the group median is above 5, the downward adjustment can push a raw average of 2 below zero, which is clamped to 0. The system is not inventing a punishment; it is faithfully reflecting that this student was rated very poorly relative to the team norm.
+
+**"What if we all agree to give everyone a 6 or 7?"**
+
+If every student gives every other student a 7, every student's raw average is 7, the group median is 7, and the adjustment is 5 - 7 = -2. Every student's final score is 7 - 2 = 5. Everyone ends up with 5. The inflation cancels out completely.
+
+This is not a bug - it is a core feature. The system is resistant to collusion. Inflating ratings does not help anyone; it only tells the assessor that the team felt uncomfortable differentiating. The pedagogical purpose of peer assessment is to give students a voice in recognising differential contribution within a team. Surrendering that voice by agreeing on uniform scores defeats the purpose entirely.
+
+### Why median rather than mean as the reference point
+
+The median is used rather than the arithmetic mean because it is robust to outliers. If one student did not engage and received very low scores from everyone, using the mean would pull the reference point down and inflate every other student's score. The median focuses on the typical student in the group and ignores the extremes, protecting well-contributing students from being distorted by a non-contributor at one end of the distribution.
+
+> The key question to ask when rating: compared to what an average member of this team contributed, did this person contribute more, the same, or less? A score of 5 means average for the team. The numbers only matter relative to each other - not in absolute terms.
+
 ## Licence
 
 This work is licensed under the [Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License](https://creativecommons.org/licenses/by-nc-sa/4.0/).

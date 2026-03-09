@@ -282,6 +282,48 @@ pre code {
     border-radius: 0;
 }
 
+/* ── Collapsible rationale ── */
+details > summary {
+    cursor: pointer;
+    color: var(--blue);
+    border-bottom: 2px solid var(--border);
+    padding-bottom: 0.35em;
+    margin-bottom: 1em;
+    font-size: 1.17em;
+    font-weight: bold;
+    list-style: none;
+    display: flex;
+    align-items: center;
+    gap: 0.5em;
+    user-select: none;
+}
+details > summary::-webkit-details-marker { display: none; }
+details > summary::before {
+    content: '\25B6';
+    font-size: 0.7em;
+    transition: transform 0.2s;
+    color: var(--blue);
+}
+details[open] > summary::before { transform: rotate(90deg); }
+details > summary:hover { color: var(--blue-dark); }
+details > summary:hover::before { color: var(--blue-dark); }
+
+.rationale-q {
+    font-weight: bold;
+    color: var(--text);
+    margin: 1.25em 0 0.3em;
+    font-size: 0.99em;
+}
+.rationale-callout {
+    background: var(--blue-light);
+    border-left: 4px solid var(--blue);
+    padding: 0.75em 1em;
+    border-radius: 0 var(--radius) var(--radius) 0;
+    font-style: italic;
+    margin: 0.5em 0 0.75em;
+    color: var(--text);
+}
+
 /* ── Footer ── */
 footer {
     border-top: 1px solid var(--border);

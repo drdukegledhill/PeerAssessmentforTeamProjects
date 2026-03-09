@@ -123,6 +123,39 @@ Group Mean: 4.67   Median: 5</code></pre>
     </section>
 
     <section class="docs-section">
+        <details>
+            <summary>Why are scores normalised - and is it fair?</summary>
+
+            <h3>What the system actually measures</h3>
+            <p>This tool does not ask you to grade your peers in the way a lecturer grades an essay. It asks you to rank relative contribution within your team. The scale from 1 to 9 has no fixed external meaning - a "6" does not mean "this person did 60% of the work." What matters is how your ratings relate to each other: if you give Alice a 7 and Bob a 5, you are saying Alice contributed roughly 40% more than Bob, relative to your team.</p>
+            <p>Because the numbers have no fixed external meaning, the system cannot simply use them as-is.</p>
+
+            <h3>Why normalisation is necessary</h3>
+            <p>Imagine two teams sitting the same group project:</p>
+            <ul>
+                <li><strong>Team A</strong> rates generously - they give each other 7s and 8s because everyone worked hard and they feel positive about it.</li>
+                <li><strong>Team B</strong> rates harshly - they give 4s and 5s because they hold each other to a high standard.</li>
+            </ul>
+            <p>Without normalisation, a student in Team A would receive a much higher score than an equally contributing student in Team B - not because they did more work, but because their teammates were kinder with the scale. That is the unfairness normalisation is designed to fix. Normalisation adjusts each team's scores so they centre on the same reference point (5), making scores comparable across teams with different rating cultures.</p>
+
+            <p class="rationale-q">"I gave someone a 6 and they ended up with a 4 - why?"</p>
+            <p>This is not a flaw. Here is what happened: multiple peers rated that person, and their raw average across all peer ratings was calculated (excluding self-assessment). If they received a 6 from you but lower scores from others, their raw average was pulled down by those other ratings. And if the team's median was above 5 - because your team rated generously overall - the adjustment brought scores down further. Your 6 was one honest data point; the result reflects what the group collectively observed, corrected for your team's rating tendencies.</p>
+
+            <p class="rationale-q">"I gave someone a 2 and they ended up with a 0 - why?"</p>
+            <p>A rating of 2 on a 1 to 9 scale is a very low relative assessment - it signals serious concern about contribution. When the group median is above 5, the downward adjustment can push a raw average of 2 below zero, which is clamped to 0. The system is not inventing a punishment; it is faithfully reflecting that this student was rated very poorly relative to the team norm. If the rating feels unfair, the right question is whether the rating itself was accurate.</p>
+
+            <p class="rationale-q">"What if we all agree to give everyone a 6 or 7?"</p>
+            <p>If every student gives every other student a 7, every student's raw average is 7, the group median is 7, and the adjustment is 5 - 7 = -2. Every student's final score is 7 - 2 = 5. <strong>Everyone ends up with 5.</strong> The inflation cancels out completely.</p>
+            <p>This is not a bug - it is a core feature. The system is resistant to collusion. Inflating ratings does not help anyone; it only tells the lecturer that the team felt uncomfortable differentiating. The pedagogical purpose of peer assessment is to give students a voice in recognising differential contribution within a team. Surrendering that voice by agreeing on uniform scores defeats the purpose entirely.</p>
+
+            <h3>Why median rather than mean as the reference point</h3>
+            <p>The median is used rather than the arithmetic mean because it is robust to outliers. If one student did not engage and received very low scores from everyone, using the mean would pull the reference point down and inflate every other student's score. The median focuses on the typical student in the group and ignores the extremes, protecting well-contributing students from being distorted by a non-contributor at one end of the distribution.</p>
+
+            <div class="rationale-callout">The key question to ask when rating: compared to what an average member of this team contributed, did this person contribute more, the same, or less? A score of 5 means average for your team. The numbers you give only matter relative to each other - not in absolute terms.</div>
+        </details>
+    </section>
+
+    <section class="docs-section">
         <h2>Python CLI Version</h2>
         <p>A command-line version is also available for batch processing or scripted workflows. It produces identical output to this web tool and requires only Python 3.6+ with no external dependencies.</p>
         <pre><code>python3 pa_report.py "team1.csv"</code></pre>
@@ -283,6 +316,21 @@ Group Mean: 4.67   Median: 5</code></pre>
             }
         });
 
+        // Mean-based normalisation (for comparison)
+        const groupMeanActual = rawAvgValues.length ? rawAvgValues.reduce((a,b) => a+b, 0) / rawAvgValues.length : 0;
+        const meanAdjustment = target - groupMeanActual;
+        let normalisedMean = {};
+        Object.entries(rawAvgs).forEach(([student, raw]) => {
+            if (nonAttendees.has(student)) {
+                normalisedMean[student] = 0;
+            } else {
+                let normScore = raw + meanAdjustment;
+                normScore = bankersRound(normScore);
+                normScore = Math.max(0, Math.min(9, normScore));
+                normalisedMean[student] = normScore;
+            }
+        });
+
         // Extract comments
         let comments = {};
         Object.entries(students).forEach(([student, cols]) => {
@@ -297,36 +345,42 @@ Group Mean: 4.67   Median: 5</code></pre>
         });
 
         // Render report
-        renderReport({students, rawAvgs, normalised, comments, groupMean, adjustment, nonAttendees});
+        renderReport({students, rawAvgs, normalised, normalisedMean, comments, groupMean, groupMeanActual, adjustment, meanAdjustment, nonAttendees});
     }
 
-    function renderReport({students, rawAvgs, normalised, comments, groupMean, adjustment, nonAttendees}) {
+    function renderReport({students, rawAvgs, normalised, normalisedMean, comments, groupMean, groupMeanActual, adjustment, meanAdjustment, nonAttendees}) {
         const studentList = Object.keys(students);
         let html = '';
         html += `<h2>Summary Statistics</h2>`;
-        html += `<p>Total students: ${studentList.length}<br>Group median (raw): ${groupMean.toFixed(2)}<br>Normalisation adjustment: ${adjustment >= 0 ? '+' : ''}${adjustment.toFixed(2)}<br>Target: 5</p>`;
+        html += `<p>Total students: ${studentList.length}</p>`;
+        html += `<table><thead><tr><th></th><th>Median-based</th><th>Mean-based</th></tr></thead><tbody>`;
+        html += `<tr><td>Group reference (raw)</td><td>${groupMean.toFixed(2)}</td><td>${groupMeanActual.toFixed(2)}</td></tr>`;
+        html += `<tr><td>Normalisation adjustment</td><td>${adjustment >= 0 ? '+' : ''}${adjustment.toFixed(2)}</td><td>${meanAdjustment >= 0 ? '+' : ''}${meanAdjustment.toFixed(2)}</td></tr>`;
+        html += `<tr><td>Target</td><td>5</td><td>5</td></tr>`;
+        html += `</tbody></table>`;
         if (nonAttendees.size > 0) {
             html += `<p><em>Non-attendees excluded from normalisation: ${[...nonAttendees].join(', ')}</em></p>`;
         }
 
         html += `<h2>Summary Table</h2>`;
-        html += `<table><thead><tr><th>#</th><th>Student</th><th>Raw Avg</th><th>Score</th></tr></thead><tbody>`;
+        html += `<table><thead><tr><th>#</th><th>Student</th><th>Raw Avg</th><th>Median Score</th><th>Mean Score</th></tr></thead><tbody>`;
         studentList.forEach((student, i) => {
-            const scoreDisplay = nonAttendees.has(student) ? 'DNA' : normalised[student];
-            html += `<tr><td>${i+1}</td><td>${student}</td><td>${rawAvgs[student].toFixed(2)}</td><td>${scoreDisplay}</td></tr>`;
+            const medDisplay = nonAttendees.has(student) ? 'DNA' : normalised[student];
+            const meanDisplay = nonAttendees.has(student) ? 'DNA' : normalisedMean[student];
+            html += `<tr><td>${i+1}</td><td>${student}</td><td>${rawAvgs[student].toFixed(2)}</td><td>${medDisplay}</td><td>${meanDisplay}</td></tr>`;
         });
         html += `</tbody></table>`;
 
         // Group stats — exclude non-attendees
         const normVals = studentList.filter(s => !nonAttendees.has(s)).map(s => normalised[s]);
-        const intMean = normVals.length ? normVals.reduce((a,b)=>a+b,0)/normVals.length : 0;
+        const normMeanVals = studentList.filter(s => !nonAttendees.has(s)).map(s => normalisedMean[s]);
+        const intMeanOfMedianScores = normVals.length ? normVals.reduce((a,b)=>a+b,0)/normVals.length : 0;
+        const intMeanOfMeanScores = normMeanVals.length ? normMeanVals.reduce((a,b)=>a+b,0)/normMeanVals.length : 0;
         const sortedVals = [...normVals].sort((a,b)=>a-b);
-        let median = 0;
-        if (sortedVals.length) {
-            // Python logic: median is middle value (not mean of two if even count)
-            median = sortedVals[Math.floor(sortedVals.length/2)];
-        }
-        html += `<p><b>Group Mean:</b> ${intMean.toFixed(2)}<br><b>Median:</b> ${median}</p>`;
+        const sortedMeanVals = [...normMeanVals].sort((a,b)=>a-b);
+        const finalMedianOfMedian = sortedVals.length ? sortedVals[Math.floor(sortedVals.length/2)] : 0;
+        const finalMedianOfMean = sortedMeanVals.length ? sortedMeanVals[Math.floor(sortedMeanVals.length/2)] : 0;
+        html += `<p><b>Normalised group mean:</b> ${intMeanOfMedianScores.toFixed(2)} (median-based) &nbsp;|&nbsp; ${intMeanOfMeanScores.toFixed(2)} (mean-based)<br><b>Normalised group median:</b> ${finalMedianOfMedian} (median-based) &nbsp;|&nbsp; ${finalMedianOfMean} (mean-based)</p>`;
 
         html += `<h2>Individual Feedback</h2>`;
         studentList.forEach(student => {
@@ -335,7 +389,7 @@ Group Mean: 4.67   Median: 5</code></pre>
             if (nonAttendees.has(student)) {
                 html += `<p><b>Score:</b> 0 <em>(Did not attend — excluded from group normalisation)</em></p>`;
             } else {
-                html += `<p><b>Score:</b> ${normalised[student]}</p>`;
+                html += `<p><b>Median score:</b> ${normalised[student]} &nbsp;|&nbsp; <b>Mean score:</b> ${normalisedMean[student]}</p>`;
             }
             if (comments[student].length) {
                 html += `<b>Peer Comments:</b><ul>`;
