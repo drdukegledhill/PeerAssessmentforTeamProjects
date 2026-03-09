@@ -54,6 +54,10 @@
         .upload-section, .docs-section {
             scroll-margin-top: 50px;
         }
+        /* When upload-section is nested inside a docs-section card, remove outer margin */
+        .docs-section .upload-section {
+            margin-bottom: 0;
+        }
     </style>
 </head>
 <body>
@@ -80,10 +84,14 @@
 
 <div class="container">
 
-    <section class="upload-section" id="tool">
-        <p class="upload-label">Select your peer assessment CSV file</p>
-        <input type="file" id="csvFile" accept=".csv" />
-        <p class="upload-hint">Export your responses as a CSV from Google Sheets, Microsoft Excel, or any other tool that supports CSV export.</p>
+    <section class="docs-section" id="tool">
+        <h2>Upload your CSV</h2>
+        <p>Export your peer assessment responses as a CSV and upload it below. The report generates instantly - your data never leaves your browser.</p>
+        <div class="upload-section">
+            <p class="upload-label">Select your peer assessment CSV file</p>
+            <input type="file" id="csvFile" accept=".csv" />
+            <p class="upload-hint">Supported sources: Google Forms (via Google Sheets export) or Microsoft Forms (via Excel, saved as CSV).</p>
+        </div>
     </section>
 
     <div id="output"></div>
