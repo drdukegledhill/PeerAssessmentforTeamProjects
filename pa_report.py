@@ -15,6 +15,16 @@ import re       # For regular expression pattern matching
 from collections import defaultdict  # For creating dictionaries with default values
 
 
+def safe_avg(values):
+    """Return the mean of values, or 0 if the list is empty."""
+    return sum(values) / len(values) if values else 0
+
+
+def clamp(value):
+    """Round using banker's rounding and clamp result to 0–9."""
+    return max(0, min(9, round(value)))
+
+
 def parse_csv(filepath):
     """
     Read CSV file and return headers and data rows.
@@ -153,8 +163,7 @@ def calculate_scores(data, students, name_col):
                 except (ValueError, IndexError):
                     pass
 
-        # Calculate average: sum divided by count, or 0 if no scores
-        raw_avgs[student] = sum(scores) / len(scores) if scores else 0
+        raw_avgs[student] = safe_avg(scores)
 
         # Flag students who received all-zero scores from every peer rater.
         # These are excluded from normalisation so they don't distort group stats.
@@ -162,7 +171,7 @@ def calculate_scores(data, students, name_col):
             non_attendees.add(student)
 
         extra_avgs[student] = {
-            label: max(0, min(9, round(sum(vals) / len(vals)))) if vals else 0
+            label: clamp(safe_avg(vals)) if vals else 0
             for label, vals in extra_scores.items()
         }
 
@@ -202,7 +211,7 @@ def normalize_scores(raw_avgs, all_scores, target=5, non_attendees=None):
         if student in non_attendees:
             normalised[student] = 0
         else:
-            normalised[student] = max(0, min(9, round(raw + adjustment)))
+            normalised[student] = clamp(raw + adjustment)
 
     return normalised, group_median, adjustment
 

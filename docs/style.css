@@ -9,6 +9,11 @@
     --white: #fff;
     --radius: 8px;
     --shadow: 0 2px 8px rgba(0,0,0,0.07);
+    --green: #166534;
+    --amber-bg: #fefce8;
+    --amber-border: #ca8a04;
+    --amber-top: #fde68a;
+    --amber-text: #92400e;
 }
 
 * { box-sizing: border-box; }
@@ -244,15 +249,18 @@ tr:nth-child(even) { background: #f8fafc; }
     padding-left: 1.25em;
 }
 
-/* ── Tip callout ── */
-.tip {
+/* ── Tip / rationale callout ── */
+.tip, .rationale-callout {
     background: var(--blue-light);
     border-left: 4px solid var(--blue);
     padding: 0.75em 1em;
     border-radius: 0 var(--radius) var(--radius) 0;
+    color: var(--text);
+}
+
+.tip {
     font-size: 0.95em;
     margin: 1.25em 0 0;
-    color: var(--text);
 }
 
 /* ── Code ── */
@@ -325,13 +333,8 @@ details > summary:hover::before { color: var(--blue-dark); }
 }
 
 .rationale-callout {
-    background: var(--blue-light);
-    border-left: 4px solid var(--blue);
-    padding: 0.75em 1em;
-    border-radius: 0 var(--radius) var(--radius) 0;
     font-style: italic;
     margin: 0.5em 0 0.75em;
-    color: var(--text);
 }
 
 /* ── Two-scale illustration ── */
@@ -377,7 +380,7 @@ details > summary:hover::before { color: var(--blue-dark); }
     color: var(--text);
 }
 
-.scale-peer .scale-big-num { color: #166534; }
+.scale-peer .scale-big-num { color: var(--green); }
 .scale-norm .scale-big-num { color: var(--blue); }
 
 .scale-brief-label {
@@ -403,13 +406,13 @@ details > summary:hover::before { color: var(--blue-dark); }
 
 .scale-caption {
     font-size: 0.86em;
-    background: #fefce8;
-    border-left: 3px solid #ca8a04;
+    background: var(--amber-bg);
+    border-left: 3px solid var(--amber-border);
     padding: 0.65em 0.9em;
     border-radius: 0 0 var(--radius) var(--radius);
     color: var(--text);
     line-height: 1.5;
-    border-top: 1px solid #fde68a;
+    border-top: 1px solid var(--amber-top);
 }
 
 @media (max-width: 520px) {
