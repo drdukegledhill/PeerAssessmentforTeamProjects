@@ -2,7 +2,9 @@
 
 A tool for analysing peer assessment data from team projects and generating normalised scores with individual feedback reports. Available as a browser-based web tool and a Python command-line script.
 
-## Web Version
+---
+
+## 🌐 Web Version
 
 The easiest way to use this tool is via the hosted web version - no installation required.
 
@@ -12,7 +14,9 @@ Upload your CSV file and the report generates instantly in your browser. Your da
 
 A companion **[Normalisation Simulator](https://drdukegledhill.github.io/PeerAssessmentforTeamProjects/simulator.html)** is also available for students to experiment with ratings interactively and see how normalisation responds in real time.
 
-## Overview
+---
+
+## 📋 Overview
 
 The tool processes peer assessment CSV files (exported from Google Forms or Microsoft Forms) and produces:
 
@@ -24,7 +28,9 @@ The tool processes peer assessment CSV files (exported from Google Forms or Micr
 
 Students are detected automatically from column headers. Self-assessments are excluded from all calculations. The tool adapts to any group size.
 
-## Setting Up Your Form
+---
+
+## ⚙️ Setting Up Your Form
 
 ### Google Forms
 
@@ -48,7 +54,9 @@ Students are detected automatically from column headers. Self-assessments are ex
 >
 > **Optional extra dimensions:** You can add additional numeric rating questions for each student (e.g. "Please rate Alice level of engagement" with options 1–9). The tool detects these automatically - any numeric column whose header contains a student's name is treated as an extra dimension, displayed in the report but not used in the normalisation calculation.
 
-## CSV Format
+---
+
+## 📄 CSV Format
 
 | Column type | Expected header pattern |
 |-------------|------------------------|
@@ -134,7 +142,9 @@ INDIVIDUAL FEEDBACK
 --------------------------------------------------------------------
 ```
 
-## Python CLI
+---
+
+## 🐍 Python CLI
 
 A command-line version is available for batch processing or scripted workflows. It produces identical output to the web tool.
 
@@ -144,7 +154,9 @@ A command-line version is available for batch processing or scripted workflows. 
 python3 pa_report.py "team1.csv"
 ```
 
-## Normalisation
+---
+
+## 🧮 Normalisation
 
 Scores are normalised so the group centres on 5, enabling fair comparison across teams with different rating tendencies:
 
@@ -155,7 +167,9 @@ Scores are normalised so the group centres on 5, enabling fair comparison across
 5. An adjustment is applied: `normalised = raw average + (5 − group median)`
 6. Results are rounded using **banker's rounding** (round half to even) and clamped to the 0–9 range.
 
-## Extra Rating Dimensions
+---
+
+## ➕ Extra Rating Dimensions
 
 If your form includes additional numeric rating questions for each student - for example, "Please rate Alice level of engagement" or "Please rate Bob communication" - these are detected automatically from the CSV headers. Any column whose header contains a student's name and is not the main overall contribution column or its justification column is treated as an extra dimension.
 
@@ -167,9 +181,11 @@ Extra dimension scores are:
 
 The label shown in the report is derived by stripping the student's name (and common lead-in phrases like "Please rate") from the column header. "Please rate Alice level of engagement" becomes "level of engagement".
 
-## Pedagogical Rationale
+---
 
-### What the system actually measures
+## 📚 Pedagogical Rationale
+
+### 📐 What the system actually measures
 
 This tool does not ask students to grade peers in the way a lecturer grades an essay. It asks them to rank relative contribution within their team (Conway et al., 1993; Falchikov & Goldfinch, 2000) - a valid pedagogical approach when students have worked closely enough to observe each other's contributions (Boud et al., 1999). The scale from 1 to 9 has no fixed external meaning - a "6" does not mean "this person did 60% of the work." What matters is how the ratings relate to each other: giving Alice a 7 and Bob a 5 says Alice contributed roughly 40% more than Bob, relative to the team.
 
@@ -183,7 +199,7 @@ Because the numbers have no fixed external meaning, the system cannot simply use
 >
 > Liu, N.-F., & Carless, D. (2006). Peer feedback: The learning element of peer assessment. *Teaching in Higher Education, 11*(3), 279–290. https://doi.org/10.1080/13562510600680582 - Supports the pedagogical value of the individual qualitative feedback output generated for each student.
 
-### Why normalisation is necessary
+### ⚖️ Why normalisation is necessary
 
 Imagine two teams sitting the same group project:
 
@@ -196,9 +212,9 @@ Without normalisation, a student in Team A would receive a much higher score tha
 >
 > Lejk, M., & Wyvill, M. (2001). The effect of the inclusion of self-assessment with peer assessment of contributions to a group project: A quantitative study of secret and agreed assessments. *Assessment & Evaluation in Higher Education, 26*(6), 551–561. https://www.tandfonline.com/doi/abs/10.1080/02602930120093887 - Examines how group rating tendencies affect scores and the rationale for adjustment mechanisms.
 
-### Common student concerns
+### 💬 Common student concerns
 
-**"I gave someone a 6 and they ended up with a 4 - why?"**
+#### "I gave someone a 6 and they ended up with a 4 - why?"
 
 Multiple peers rated that person, and their raw average across all peer ratings was calculated (excluding self-assessment; Sluijsmans et al., 1999; Topping, 1998). If they received a 6 from one rater but lower scores from others, their raw average was pulled down by those other ratings. And if the team's median was above 5 - because the team rated generously overall - the adjustment brought scores down further. Each individual rating is one honest data point; the result reflects what the group collectively observed, corrected for the team's rating tendencies.
 
@@ -206,13 +222,13 @@ Multiple peers rated that person, and their raw average across all peer ratings 
 >
 > Topping, K. (1998). Peer assessment between students in colleges and universities. *Review of Educational Research, 68*(3), 249–276. https://doi.org/10.3102/00346543068003249 - Widely cited review recommending self-assessments be treated separately from peer ratings due to self-serving bias.
 
-**"I gave someone a 2 and they ended up with a 0 - why?"**
+#### "I gave someone a 2 and they ended up with a 0 - why?"
 
 A rating of 2 on a 1 to 9 scale is a very low relative assessment - it signals serious concern about contribution. When the group median is above 5, the downward adjustment can push a raw average of 2 below zero, which is clamped to 0. This is a direct consequence of the normalisation formula: the same group-level adjustment that protects well-contributing students from generous rating cultures will push already very low scores further down (Lejk & Wyvill, 2001). The system is not inventing a punishment; it is faithfully reflecting that this student was rated very poorly relative to the team norm.
 
 > Lejk, M., & Wyvill, M. (2001). The effect of the inclusion of self-assessment with peer assessment of contributions to a group project: A quantitative study of secret and agreed assessments. *Assessment & Evaluation in Higher Education, 26*(6), 551–561. https://www.tandfonline.com/doi/abs/10.1080/02602930120093887 - Examines how group-level normalisation adjustments affect individual scores across the distribution, including for low-scoring students.
 
-**"What if we all agree to give everyone a 6 or 7?"**
+#### "What if we all agree to give everyone a 6 or 7?"
 
 If every student gives every other student a 7, every student's raw average is 7, the group median is 7, and the adjustment is 5 - 7 = -2. Every student's final score is 7 - 2 = 5. Everyone ends up with 5. The inflation cancels out completely.
 
@@ -222,23 +238,23 @@ This is not a bug - it is a core feature. The system is resistant to collusion. 
 >
 > Falchikov, N. (1995). Peer feedback marking: Developing peer assessment. *Innovations in Education and Training International, 32*(2), 175–187. https://doi.org/10.1080/1355800950320212 - Addresses student collusion strategies (uniform scoring) and the requirement for system design to be robust to them.
 
-**"One person gave me a really low score - doesn't that drag my average down unfairly?"**
+#### "One person gave me a really low score - doesn't that drag my average down unfairly?"
 
 Your raw average is calculated across all peer ratings you received. With a typical group of four or five students, one extreme score has limited influence. If three peers rate you at 7 and one rates you at 2, your raw average is 5.75 - noticeably lower than if that rater had given 6, but not catastrophic. Aggregating multiple independent peer ratings is precisely what makes the system more reliable than any single judgement (Falchikov & Goldfinch, 2000). The more raters there are, the more resilient the system is to any single outlier. If you believe a rating was submitted maliciously rather than honestly, that is a matter to raise directly with your lecturer - but the system does not remove outliers automatically, because doing so would itself create opportunities for gaming (for example, a group agreeing to all rate one person low in order to trigger removal).
 
 > Falchikov, N., & Goldfinch, J. (2000). Student peer assessment in higher education: A meta-analysis comparing peer and teacher marks. *Review of Educational Research, 70*(3), 287–322. https://doi.org/10.3102/00346543070003287 - Meta-analytic evidence that aggregated peer ratings are substantially more reliable than individual peer judgements, and that reliability increases with the number of raters.
 
-**"I was ill and missed a session - will I be flagged as DNA?"**
+#### "I was ill and missed a session - will I be flagged as DNA?"
 
 The DNA (Did Not Attend) flag is only triggered when every single peer rater gives you a score of 0. Missing one session, being less visible at certain points, or receiving a low score from some but not all peers will not trigger the flag. In practice, DNA only occurs when a student was absent for the entire assessed period and all their teammates reflect that unanimously in their ratings.
 
-**"My score is below 5 - does that mean I'm a weak student?"**
+#### "My score is below 5 - does that mean I'm a weak student?"
 
 Not at all. The peer score measures your contribution *relative to your team*, not your academic ability in any absolute sense. A score of 5 means you contributed at roughly the average level for your group. A score of 4 means your peers observed you contributing slightly less than the team norm - but that is a statement about this project, with this group, during this period. It says nothing about your capability as a student.
 
 Consider what the score is actually attached to. If your team produces a strong piece of work that earns a good mark, a peer score of 4 still places you in the context of that strong work - you are a slightly below-average contributor to an above-average outcome. A score below 5 in a high-performing team can represent genuinely solid academic work; it simply means your teammates were observed contributing a little more during this particular project. Treat the score as one piece of specific, contextual feedback about how your contribution was perceived within this team - not as a verdict on you as a student.
 
-**"I got sixes and positive comments - so why did I end up with a four?"**
+#### "I got sixes and positive comments - so why did I end up with a four?"
 
 This is the most important thing to understand about how this system works: **your peers did give you a six. That is what they thought of you. The four is not what they said.**
 
@@ -258,7 +274,7 @@ The descriptions in your module brief describe the vote your peers cast. A norma
 
 If your peers genuinely gave you 4s and 5s rather than 6s and 7s, that is a different situation - and one worth discussing with your lecturer rather than dismissing.
 
-### Why median rather than mean as the reference point
+### 📊 Why median rather than mean as the reference point
 
 The median is used rather than the arithmetic mean because it is robust to outliers (Goldfinch & Raeside, 1990; Lejk et al., 1996). If one student did not engage and received very low scores from everyone, using the mean would pull the reference point down and inflate every other student's score. The median focuses on the typical student in the group and ignores the extremes, protecting well-contributing students from being distorted by a non-contributor at one end of the distribution.
 
@@ -266,7 +282,7 @@ The median is used rather than the arithmetic mean because it is robust to outli
 >
 > Lejk, M., Wyvill, M., & Farrow, S. (1996). A survey of methods of deriving individual grades from group assessments. *Assessment & Evaluation in Higher Education, 21*(3), 267–280. https://doi.org/10.1080/0260293960210307 - Compares methods for deriving individual scores from group ratings; supports the choice of median over mean as outlier-robust.
 
-### Why scores sometimes round unexpectedly - banker's rounding
+### 🔢 Why scores sometimes round unexpectedly - banker's rounding
 
 Final scores are rounded using banker's rounding (round half to even) rather than the familiar "always round 0.5 up" rule. Under standard rounding, 4.5 rounds to 5 and 5.5 rounds to 6 - but so does 6.5, 7.5, and so on, introducing a small but consistent upward bias across a dataset. Banker's rounding instead rounds half-values to the nearest even integer: 4.5 rounds to 4, 5.5 rounds to 6, 6.5 rounds to 6, 7.5 rounds to 8. Over many scores, upward and downward roundings balance out, and no student benefits systematically from where their score happens to land relative to a 0.5 boundary. This is the default rounding mode in IEEE floating-point arithmetic (IEEE, 2008) and is recommended for its statistical neutrality across large datasets (Knuth, 1997).
 
@@ -276,7 +292,9 @@ Final scores are rounded using banker's rounding (round half to even) rather tha
 
 **The key question to ask when rating:** compared to what an average member of this team contributed, did this person contribute more, the same, or less? A score of 5 means average for the team. The numbers only matter relative to each other - not in absolute terms.
 
-## Licence
+---
+
+## 📜 Licence
 
 This work is licensed under the [Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License](https://creativecommons.org/licenses/by-nc-sa/4.0/).
 
@@ -289,6 +307,8 @@ Under the following terms:
 - **NonCommercial**: you may not use the material for commercial purposes.
 - **ShareAlike**: if you remix, transform, or build upon the material, you must distribute your contributions under the same licence.
 
-## Author
+---
+
+## 👤 Author
 
 Dr Duke Gledhill, University of Huddersfield
