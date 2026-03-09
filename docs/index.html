@@ -50,6 +50,10 @@
             border-top: 1px solid var(--border);
         }
         .back-to-top:hover { color: var(--blue); }
+        /* Offset anchor scroll targets so sticky nav doesn't obscure them */
+        .upload-section, .docs-section {
+            scroll-margin-top: 50px;
+        }
     </style>
 </head>
 <body>
@@ -63,6 +67,7 @@
 
 <nav class="section-nav" aria-label="Page sections">
     <ul>
+        <li><a href="#section=tool" data-section="tool">Upload</a></li>
         <li><a href="#section=how-to-use" data-section="how-to-use">How to Use</a></li>
         <li><a href="#section=setup" data-section="setup">Setting Up</a></li>
         <li><a href="#section=csv-format" data-section="csv-format">CSV Format</a></li>
@@ -75,7 +80,7 @@
 
 <div class="container">
 
-    <section class="upload-section">
+    <section class="upload-section" id="tool">
         <p class="upload-label">Select your peer assessment CSV file</p>
         <input type="file" id="csvFile" accept=".csv" />
         <p class="upload-hint">Export your responses as a CSV from Google Sheets, Microsoft Excel, or any other tool that supports CSV export.</p>
@@ -285,7 +290,7 @@ Group Mean: 4.67   Median: 5</code></pre>
 
 <script>
     // Section navigation: hash deep-linking and scroll-spy
-    const sectionIds = ['how-to-use', 'setup', 'csv-format', 'normalisation', 'rationale', 'simulator', 'python-cli'];
+    const sectionIds = ['tool', 'how-to-use', 'setup', 'csv-format', 'normalisation', 'rationale', 'simulator', 'python-cli'];
 
     function activateNavLink(sectionId) {
         document.querySelectorAll('.section-nav a[data-section]').forEach(a => {
