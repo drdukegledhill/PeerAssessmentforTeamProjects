@@ -178,7 +178,7 @@ Group median (raw): 7.50  |  Normalisation adjustment: -2.50  |  Target: 5
 2   Bob            7.50       5
 3   Charlie        6.50       4
 
-Group Mean: 4.67   Median: 5</code></pre>
+Group Median: 5</code></pre>
         <a href="#" class="back-to-top">Back to top</a>
     </section>
 
@@ -560,9 +560,8 @@ Group Mean: 4.67   Median: 5</code></pre>
 
         // Group stats - exclude non-attendees
         const normVals = studentList.filter(s => !nonAttendees.has(s)).map(s => normalised[s]);
-        const grpMean = normVals.length ? normVals.reduce((a,b)=>a+b,0)/normVals.length : 0;
         const grpMedian = normVals.length ? [...normVals].sort((a,b)=>a-b)[Math.floor(normVals.length/2)] : 0;
-        html += `<p><b>Group mean (normalised):</b> ${grpMean.toFixed(2)} &nbsp;|&nbsp; <b>Group median (normalised):</b> ${grpMedian}</p>`;
+        html += `<p><b>Group median (normalised):</b> ${grpMedian}</p>`;
 
         html += `<h2>Individual Feedback</h2>`;
         studentList.forEach(student => {

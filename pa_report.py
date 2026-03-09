@@ -249,10 +249,8 @@ def generate_report(students, raw_avgs, normalised, comments,
 
     # Group stats for normalised scores (excluding non-attendees)
     att = [v for k, v in normalised.items() if k not in non_attendees]
-    grp_mean = sum(att) / len(att) if att else 0
     grp_median = sorted(att)[len(att) // 2] if att else 0
 
-    print(f"{'Group mean (normalised):':<50}{grp_mean:>10.2f}")
     print(f"{'Group median (normalised):':<50}{grp_median:>10}")
     print()
 
