@@ -315,6 +315,15 @@ details > summary:hover::before { color: var(--blue-dark); }
     margin: 1.25em 0 0.3em;
     font-size: 0.99em;
 }
+.ref-block {
+    font-size: 0.78em;
+    color: var(--text-muted);
+    border-left: 3px solid var(--border);
+    padding: 0.4em 0.75em;
+    margin: 0.75em 0 0;
+    line-height: 1.65;
+}
+
 .rationale-callout {
     background: var(--blue-light);
     border-left: 4px solid var(--blue);

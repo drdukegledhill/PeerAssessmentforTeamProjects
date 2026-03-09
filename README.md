@@ -143,9 +143,17 @@ Scores are normalised so the group centres on 5, enabling fair comparison across
 
 ### What the system actually measures
 
-This tool does not ask students to grade peers in the way a lecturer grades an essay. It asks them to rank relative contribution within their team. The scale from 1 to 9 has no fixed external meaning - a "6" does not mean "this person did 60% of the work." What matters is how the ratings relate to each other: giving Alice a 7 and Bob a 5 says Alice contributed roughly 40% more than Bob, relative to the team.
+This tool does not ask students to grade peers in the way a lecturer grades an essay. It asks them to rank relative contribution within their team (Conway et al., 1993; Falchikov & Goldfinch, 2000). The scale from 1 to 9 has no fixed external meaning - a "6" does not mean "this person did 60% of the work." What matters is how the ratings relate to each other: giving Alice a 7 and Bob a 5 says Alice contributed roughly 40% more than Bob, relative to the team.
 
 Because the numbers have no fixed external meaning, the system cannot simply use them as-is.
+
+> Conway, R., Kember, D., Sivan, A., & Wu, M. (1993). Peer assessment of an individual's contribution to a group project. *Assessment & Evaluation in Higher Education, 18*(1), 45–56. https://doi.org/10.1080/0260293930180105 - Directly supports the relative contribution model: peer ratings as rankings within a team rather than absolute grades.
+>
+> Falchikov, N., & Goldfinch, J. (2000). Student peer assessment in higher education: A meta-analysis comparing peer and teacher marks. *Review of Educational Research, 70*(3), 287–322. https://doi.org/10.3102/00346543070003287 - Meta-analytic evidence for the validity and reliability of peer contribution ratings.
+>
+> Boud, D., Cohen, R., & Sampson, J. (1999). Peer learning and assessment. *Assessment & Evaluation in Higher Education, 24*(4), 413–426. https://doi.org/10.1080/0260293990240405 - Foundational conditions under which peer assessment is pedagogically valid in team project contexts.
+>
+> Liu, N.-F., & Carless, D. (2006). Peer feedback: The learning element of peer assessment. *Teaching in Higher Education, 11*(3), 279–290. https://doi.org/10.1080/13562510600680582 - Supports the pedagogical value of the individual qualitative feedback output generated for each student.
 
 ### Why normalisation is necessary
 
@@ -154,13 +162,21 @@ Imagine two teams sitting the same group project:
 - **Team A** rates generously - they give each other 7s and 8s because everyone worked hard and they feel positive about it.
 - **Team B** rates harshly - they give 4s and 5s because they hold each other to a high standard.
 
-Without normalisation, a student in Team A would receive a much higher score than an equally contributing student in Team B - not because they did more work, but because their teammates were kinder with the scale. Normalisation adjusts each team's scores so they centre on the same reference point (5), making scores comparable across teams with different rating cultures.
+Without normalisation, a student in Team A would receive a much higher score than an equally contributing student in Team B - not because they did more work, but because their teammates were kinder with the scale. Normalisation adjusts each team's scores so they centre on the same reference point (5), making scores comparable across teams with different rating cultures (Cheng & Warren, 2000; Lejk & Wyvill, 2001).
+
+> Cheng, W., & Warren, M. (2000). Making a difference: Using peers to assess individual students' contributions to a group project. *Teaching in Higher Education, 5*(2), 243–255. https://doi.org/10.1080/135625100114885 - Addresses the comparability problem across groups with different rating cultures and the case for normalisation.
+>
+> Lejk, M., & Wyvill, M. (2001). The effect of the inclusion of self-assessment with peer assessment of contributions to a group project: A quantitative study of secret and agreed assessments. *Assessment & Evaluation in Higher Education, 26*(6), 551–561. https://doi.org/10.1080/02602930120093728 - Examines how group rating tendencies affect scores and the rationale for adjustment mechanisms.
 
 ### Common student concerns
 
 **"I gave someone a 6 and they ended up with a 4 - why?"**
 
-Multiple peers rated that person, and their raw average across all peer ratings was calculated (excluding self-assessment). If they received a 6 from one rater but lower scores from others, their raw average was pulled down by those other ratings. And if the team's median was above 5 - because the team rated generously overall - the adjustment brought scores down further. Each individual rating is one honest data point; the result reflects what the group collectively observed, corrected for the team's rating tendencies.
+Multiple peers rated that person, and their raw average across all peer ratings was calculated (excluding self-assessment; Sluijsmans et al., 1999; Topping, 1998). If they received a 6 from one rater but lower scores from others, their raw average was pulled down by those other ratings. And if the team's median was above 5 - because the team rated generously overall - the adjustment brought scores down further. Each individual rating is one honest data point; the result reflects what the group collectively observed, corrected for the team's rating tendencies.
+
+> Sluijsmans, D., Dochy, F., & Moerkerke, G. (1999). Creating a learning environment by using self-, peer-, and co-assessment. *Learning Environments Research, 1*(3), 293–319. https://doi.org/10.1023/A:1009932704688 - Distinguishes self-assessment from peer assessment and provides methodological justification for excluding self-ratings from calculations.
+>
+> Topping, K. (1998). Peer assessment between students in colleges and universities. *Review of Educational Research, 68*(3), 249–276. https://doi.org/10.3102/00346543068003249 - Widely cited review recommending self-assessments be treated separately from peer ratings due to self-serving bias.
 
 **"I gave someone a 2 and they ended up with a 0 - why?"**
 
@@ -170,7 +186,11 @@ A rating of 2 on a 1 to 9 scale is a very low relative assessment - it signals s
 
 If every student gives every other student a 7, every student's raw average is 7, the group median is 7, and the adjustment is 5 - 7 = -2. Every student's final score is 7 - 2 = 5. Everyone ends up with 5. The inflation cancels out completely.
 
-This is not a bug - it is a core feature. The system is resistant to collusion. Inflating ratings does not help anyone; it only tells the assessor that the team felt uncomfortable differentiating. The pedagogical purpose of peer assessment is to give students a voice in recognising differential contribution within a team. Surrendering that voice by agreeing on uniform scores defeats the purpose entirely.
+This is not a bug - it is a core feature. The system is resistant to collusion. Inflating ratings does not help anyone; it only tells the assessor that the team felt uncomfortable differentiating. The pedagogical purpose of peer assessment is to give students a voice in recognising differential contribution within a team (Brooks & Ammons, 2003; Falchikov, 1995). Surrendering that voice by agreeing on uniform scores defeats the purpose entirely.
+
+> Brooks, C. M., & Ammons, J. L. (2003). Free riding and the lessons of classroom experience. *Journal of Education for Business, 78*(4), 217–220. https://doi.org/10.1080/08832320309598606 - Supports the necessity of differentiated peer assessment to surface free-rider problems in group work.
+>
+> Falchikov, N. (1995). Peer feedback marking: Developing peer assessment. *Innovations in Education and Training International, 32*(2), 175–187. https://doi.org/10.1080/1355800950320212 - Addresses student collusion strategies (uniform scoring) and the requirement for system design to be robust to them.
 
 **"One person gave me a really low score - doesn't that drag my average down unfairly?"**
 
@@ -182,7 +202,11 @@ The DNA (Did Not Attend) flag is only triggered when every single peer rater giv
 
 ### Why median rather than mean as the reference point
 
-The median is used rather than the arithmetic mean because it is robust to outliers. If one student did not engage and received very low scores from everyone, using the mean would pull the reference point down and inflate every other student's score. The median focuses on the typical student in the group and ignores the extremes, protecting well-contributing students from being distorted by a non-contributor at one end of the distribution.
+The median is used rather than the arithmetic mean because it is robust to outliers (Goldfinch & Raeside, 1990; Lejk et al., 1996). If one student did not engage and received very low scores from everyone, using the mean would pull the reference point down and inflate every other student's score. The median focuses on the typical student in the group and ignores the extremes, protecting well-contributing students from being distorted by a non-contributor at one end of the distribution.
+
+> Goldfinch, J., & Raeside, R. (1990). Development of a peer assessment technique for obtaining individual marks on a group project. *Assessment & Evaluation in Higher Education, 15*(3), 210–231. https://doi.org/10.1080/0260293900150304 - Early treatment of statistical distortion caused by non-contributors on group averages; supports robust scoring design.
+>
+> Lejk, M., Wyvill, M., & Farrow, S. (1996). A survey of methods of deriving individual grades from group assessments. *Assessment & Evaluation in Higher Education, 21*(3), 267–280. https://doi.org/10.1080/0260293960210307 - Compares methods for deriving individual scores from group ratings; supports the choice of median over mean as outlier-robust.
 
 ### Why scores sometimes round unexpectedly - banker's rounding
 
