@@ -220,6 +220,16 @@ The four is the result of a calculation that happened after your peers submitted
 
 Here is the part students often miss: **a large downward adjustment is a sign of a strong, positive team.** It means your peers thought highly of each other. If the adjustment was -2 or -3, your team's raw median was 7 or 8 - your teammates were giving each other genuinely good ratings. The system has levelled that down to make scores comparable across teams with different rating cultures, but the underlying signal remains: your peers rated you at 6, in a team where everyone was rated highly. The positive comments your peers wrote are real, and they reflect what your peers actually thought. The final score tells you where you sat relative to your team after adjustment; it does not cancel the positive feedback your peers gave.
 
+One more important point: if your module brief includes a table that assigns a label to each vote choice - for example, "choice 5 = performed adequately", "choice 6 = valuable contributor", "choice 7 = instrumental" - those labels describe what your peers *intended* when they cast their vote. They do not describe your normalised score. The two are on different scales entirely:
+
+| | What your peers chose | After normalisation |
+|---|---|---|
+| **Number** | 6 | 4 |
+| **Meaning** | "Valuable contributor (+5%)" - this is what they thought of you | Team median was 7, adjustment -2; 6 + (-2) = 4, applied equally to everyone |
+| **Scale** | Brief's vote table | Relative position within your team |
+
+The descriptions in your module brief describe the vote your peers cast. A normalised score of 4 is **not** "under performed" - it is where you landed after the group adjustment. Look at what your peers chose, not what that number maps to on the brief's table.
+
 If your peers genuinely gave you 4s and 5s rather than 6s and 7s, that is a different situation - and one worth discussing with your lecturer rather than dismissing.
 
 ### Why median rather than mean as the reference point
