@@ -10,6 +10,8 @@ The easiest way to use this tool is via the hosted web version - no installation
 
 Upload your CSV file and the report generates instantly in your browser. Your data never leaves your device.
 
+A companion **[Normalisation Simulator](https://drdukegledhill.github.io/PeerAssessmentforTeamProjects/simulator.html)** is also available for students to experiment with ratings interactively and see how normalisation responds in real time.
+
 ## Overview
 
 The tool processes peer assessment CSV files (exported from Google Forms or Microsoft Forms) and produces:
@@ -65,57 +67,58 @@ Charlie,8,Led the project well,7,Helpful,6,Self assessment
 ```
 Detected 3 students: Alice, Bob, Charlie
 
-======================================================================
+================================================================================
 PEER ASSESSMENT REPORT
-======================================================================
+================================================================================
 
 Total students: 3
-Group median (raw): 7.50
-Normalisation adjustment: -2.50
-Target: 5
+                                    Median-based    Mean-based
+Group reference (raw):                      7.50          7.17
+Normalisation adjustment:                  -2.50         -2.17
+Target:                                        5             5
 
-----------------------------------------------------------------------
+--------------------------------------------------------------------------------
 SUMMARY TABLE
-----------------------------------------------------------------------
-#     Student                          Raw Avg       Score
-----------------------------------------------------------------------
-1     Alice                               7.50           5
-2     Bob                                 7.50           5
-3     Charlie                             6.50           4
-----------------------------------------------------------------------
-                                    Group Mean:        4.67
-                                       Median:           5
+--------------------------------------------------------------------------------
+#     Student                          Raw Avg    Median Score      Mean Score
+--------------------------------------------------------------------------------
+1     Alice                               7.50               5               5
+2     Bob                                 7.50               5               5
+3     Charlie                             6.50               4               4
+--------------------------------------------------------------------------------
+Normalised group mean:                                    4.67            4.67
+Normalised group median:                                     5               5
 
-======================================================================
+================================================================================
 INDIVIDUAL FEEDBACK
-======================================================================
+================================================================================
 
 >>> Alice
-    Score: 5
+    Median score: 5   |   Mean score: 5
 
     Peer Comments:
     - Very organised
     - Led the project well
 
-----------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 >>> Bob
-    Score: 5
+    Median score: 5   |   Mean score: 5
 
     Peer Comments:
     - Great teamwork
     - Helpful
 
-----------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 >>> Charlie
-    Score: 4
+    Median score: 4   |   Mean score: 4
 
     Peer Comments:
     - Could communicate more
     - Reliable
 
-----------------------------------------------------------------------
+--------------------------------------------------------------------------------
 ```
 
 ## Python CLI
