@@ -1,2 +1,5 @@
 # Data files - exclude student data for privacy
 *.csv
+
+# Root-level docs provided externally
+/*.pdf

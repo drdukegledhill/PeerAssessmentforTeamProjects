@@ -16,22 +16,20 @@
         }
         .section-nav ul {
             display: flex;
+            flex-wrap: wrap;
             gap: 0;
             list-style: none;
             margin: 0 auto;
             padding: 0 1.5em;
             max-width: 860px;
-            overflow-x: auto;
-            scrollbar-width: none;
         }
-        .section-nav ul::-webkit-scrollbar { display: none; }
         .section-nav li { flex-shrink: 0; }
         .section-nav a {
             display: block;
-            padding: 0.65em 1em;
+            padding: 0.55em 0.8em;
             color: var(--text-muted);
             text-decoration: none;
-            font-size: 0.88em;
+            font-size: 0.85em;
             font-weight: bold;
             border-bottom: 3px solid transparent;
             white-space: nowrap;
