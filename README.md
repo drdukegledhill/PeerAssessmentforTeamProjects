@@ -206,6 +206,12 @@ Your raw average is calculated across all peer ratings you received. With a typi
 
 The DNA (Did Not Attend) flag is only triggered when every single peer rater gives you a score of 0. Missing one session, being less visible at certain points, or receiving a low score from some but not all peers will not trigger the flag. In practice, DNA only occurs when a student was absent for the entire assessed period and all their teammates reflect that unanimously in their ratings.
 
+**"My score is below 5 - does that mean I'm a weak student?"**
+
+Not at all. The peer score measures your contribution *relative to your team*, not your academic ability in any absolute sense. A score of 5 means you contributed at roughly the average level for your group. A score of 4 means your peers observed you contributing slightly less than the team norm - but that is a statement about this project, with this group, during this period. It says nothing about your capability as a student.
+
+Consider what the score is actually attached to. If your team produces a strong piece of work that earns a good mark, a peer score of 4 still places you in the context of that strong work - you are a slightly below-average contributor to an above-average outcome. A score below 5 in a high-performing team can represent genuinely solid academic work; it simply means your teammates were observed contributing a little more during this particular project. Treat the score as one piece of specific, contextual feedback about how your contribution was perceived within this team - not as a verdict on you as a student.
+
 ### Why median rather than mean as the reference point
 
 The median is used rather than the arithmetic mean because it is robust to outliers (Goldfinch & Raeside, 1990; Lejk et al., 1996). If one student did not engage and received very low scores from everyone, using the mean would pull the reference point down and inflate every other student's score. The median focuses on the typical student in the group and ignores the extremes, protecting well-contributing students from being distorted by a non-contributor at one end of the distribution.
