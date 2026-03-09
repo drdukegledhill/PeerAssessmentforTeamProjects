@@ -17,6 +17,7 @@ The tool processes peer assessment CSV files (exported from Google Forms or Micr
 - **Normalised scores** (0–9 scale) centred around a target median of 5
 - **Summary tables** with each student's raw average and normalised score
 - **Individual feedback** with aggregated peer comments
+- **Did Not Attend (DNA)** detection: students who receive all zeros from every peer rater are flagged and excluded from the normalisation reference
 
 Students are detected automatically from column headers. Self-assessments are excluded from all calculations. The tool adapts to any group size.
 
