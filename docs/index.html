@@ -335,30 +335,20 @@ Group Mean: 4.67   Median: 5</code></pre>
     window.addEventListener('load', handleHash);
     window.addEventListener('hashchange', handleHash);
 
-    // Scroll-spy: highlight nav link for the most visible section.
-    // Only activates after the user has scrolled, so page load / refresh
-    // does not spuriously update the hash from already-visible sections.
-    let hasScrolled = false;
-    window.addEventListener('scroll', () => { hasScrolled = true; }, { passive: true, once: true });
-
-    const scrollObserver = new IntersectionObserver(entries => {
-        if (!hasScrolled) return;
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                const id = entry.target.id;
-                history.replaceState(null, '', '#section=' + id);
-                activateNavLink(id);
-            }
-        });
-    // rootMargin creates a narrow band just below the sticky nav to the viewport
-    // midpoint. Only the section whose top enters that band fires, so multiple
-    // short sections visible at once don't all compete to set the active link.
-    }, { rootMargin: '-50px 0px -50% 0px', threshold: 0 });
-
-    sectionIds.forEach(id => {
-        const el = document.getElementById(id);
-        if (el) scrollObserver.observe(el);
-    });
+    // Scroll-spy: activate a nav link only once its section top has scrolled
+    // past the sticky nav - i.e. the section is truly "current", not just visible.
+    const NAV_HEIGHT = 55;
+    window.addEventListener('scroll', () => {
+        let current = null;
+        for (const id of sectionIds) {
+            const el = document.getElementById(id);
+            if (el && el.getBoundingClientRect().top <= NAV_HEIGHT) current = id;
+        }
+        if (current) {
+            history.replaceState(null, '', '#section=' + current);
+            activateNavLink(current);
+        }
+    }, { passive: true });
 
     function switchTab(btn, panelId) {
         const tabs = btn.closest('.tabs');
