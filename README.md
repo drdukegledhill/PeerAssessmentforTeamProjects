@@ -172,9 +172,21 @@ If every student gives every other student a 7, every student's raw average is 7
 
 This is not a bug - it is a core feature. The system is resistant to collusion. Inflating ratings does not help anyone; it only tells the assessor that the team felt uncomfortable differentiating. The pedagogical purpose of peer assessment is to give students a voice in recognising differential contribution within a team. Surrendering that voice by agreeing on uniform scores defeats the purpose entirely.
 
+**"One person gave me a really low score - doesn't that drag my average down unfairly?"**
+
+Your raw average is calculated across all peer ratings you received. With a typical group of four or five students, one extreme score has limited influence. If three peers rate you at 7 and one rates you at 2, your raw average is 5.75 - noticeably lower than if that rater had given 6, but not catastrophic. The more raters there are, the more resilient the system is to any single outlier. If you believe a rating was submitted maliciously rather than honestly, that is a matter to raise directly with your lecturer - but the system does not remove outliers automatically, because doing so would itself create opportunities for gaming (for example, a group agreeing to all rate one person low in order to trigger removal).
+
+**"I was ill and missed a session - will I be flagged as DNA?"**
+
+The DNA (Did Not Attend) flag is only triggered when every single peer rater gives you a score of 0. Missing one session, being less visible at certain points, or receiving a low score from some but not all peers will not trigger the flag. In practice, DNA only occurs when a student was absent for the entire assessed period and all their teammates reflect that unanimously in their ratings.
+
 ### Why median rather than mean as the reference point
 
 The median is used rather than the arithmetic mean because it is robust to outliers. If one student did not engage and received very low scores from everyone, using the mean would pull the reference point down and inflate every other student's score. The median focuses on the typical student in the group and ignores the extremes, protecting well-contributing students from being distorted by a non-contributor at one end of the distribution.
+
+### Why scores sometimes round unexpectedly - banker's rounding
+
+Final scores are rounded using banker's rounding (round half to even) rather than the familiar "always round 0.5 up" rule. Under standard rounding, 4.5 rounds to 5 and 5.5 rounds to 6 - but so does 6.5, 7.5, and so on, introducing a small but consistent upward bias across a dataset. Banker's rounding instead rounds half-values to the nearest even integer: 4.5 rounds to 4, 5.5 rounds to 6, 6.5 rounds to 6, 7.5 rounds to 8. Over many scores, upward and downward roundings balance out, and no student benefits systematically from where their score happens to land relative to a 0.5 boundary. This is the rounding standard used in finance and scientific computing (IEEE 754) for exactly this reason.
 
 > The key question to ask when rating: compared to what an average member of this team contributed, did this person contribute more, the same, or less? A score of 5 means average for the team. The numbers only matter relative to each other - not in absolute terms.
 
