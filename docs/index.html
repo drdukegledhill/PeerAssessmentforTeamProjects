@@ -492,21 +492,6 @@ Group Mean: 4.67   Median: 5</code></pre>
             }
         });
 
-        // Mean-based normalisation (for comparison)
-        const groupMeanActual = rawAvgValues.length ? rawAvgValues.reduce((a,b) => a+b, 0) / rawAvgValues.length : 0;
-        const meanAdjustment = target - groupMeanActual;
-        let normalisedMean = {};
-        Object.entries(rawAvgs).forEach(([student, raw]) => {
-            if (nonAttendees.has(student)) {
-                normalisedMean[student] = 0;
-            } else {
-                let normScore = raw + meanAdjustment;
-                normScore = bankersRound(normScore);
-                normScore = Math.max(0, Math.min(9, normScore));
-                normalisedMean[student] = normScore;
-            }
-        });
-
         // Extract comments
         let comments = {};
         Object.entries(students).forEach(([student, cols]) => {
@@ -521,42 +506,36 @@ Group Mean: 4.67   Median: 5</code></pre>
         });
 
         // Render report
-        renderReport({students, rawAvgs, normalised, normalisedMean, comments, groupMean, groupMeanActual, adjustment, meanAdjustment, nonAttendees});
+        renderReport({students, rawAvgs, normalised, comments, groupMean, adjustment, nonAttendees});
     }
 
-    function renderReport({students, rawAvgs, normalised, normalisedMean, comments, groupMean, groupMeanActual, adjustment, meanAdjustment, nonAttendees}) {
+    function renderReport({students, rawAvgs, normalised, comments, groupMean, adjustment, nonAttendees}) {
         const studentList = Object.keys(students);
         let html = '';
         html += `<h2>Summary Statistics</h2>`;
         html += `<p>Total students: ${studentList.length}</p>`;
-        html += `<table><thead><tr><th></th><th>Median-based</th><th>Mean-based</th></tr></thead><tbody>`;
-        html += `<tr><td>Group reference (raw)</td><td>${groupMean.toFixed(2)}</td><td>${groupMeanActual.toFixed(2)}</td></tr>`;
-        html += `<tr><td>Normalisation adjustment</td><td>${adjustment >= 0 ? '+' : ''}${adjustment.toFixed(2)}</td><td>${meanAdjustment >= 0 ? '+' : ''}${meanAdjustment.toFixed(2)}</td></tr>`;
-        html += `<tr><td>Target</td><td>5</td><td>5</td></tr>`;
+        html += `<table><thead><tr><th></th><th></th></tr></thead><tbody>`;
+        html += `<tr><td>Group median (raw)</td><td>${groupMean.toFixed(2)}</td></tr>`;
+        html += `<tr><td>Normalisation adjustment</td><td>${adjustment >= 0 ? '+' : ''}${adjustment.toFixed(2)}</td></tr>`;
+        html += `<tr><td>Target</td><td>5</td></tr>`;
         html += `</tbody></table>`;
         if (nonAttendees.size > 0) {
             html += `<p><em>Non-attendees excluded from normalisation: ${[...nonAttendees].join(', ')}</em></p>`;
         }
 
         html += `<h2>Summary Table</h2>`;
-        html += `<table><thead><tr><th>#</th><th>Student</th><th>Raw Avg</th><th>Median Score</th><th>Mean Score</th></tr></thead><tbody>`;
+        html += `<table><thead><tr><th>#</th><th>Student</th><th>Raw Avg</th><th>Score</th></tr></thead><tbody>`;
         studentList.forEach((student, i) => {
-            const medDisplay = nonAttendees.has(student) ? 'DNA' : normalised[student];
-            const meanDisplay = nonAttendees.has(student) ? 'DNA' : normalisedMean[student];
-            html += `<tr><td>${i+1}</td><td>${student}</td><td>${rawAvgs[student].toFixed(2)}</td><td>${medDisplay}</td><td>${meanDisplay}</td></tr>`;
+            const scoreDisplay = nonAttendees.has(student) ? 'DNA' : normalised[student];
+            html += `<tr><td>${i+1}</td><td>${student}</td><td>${rawAvgs[student].toFixed(2)}</td><td>${scoreDisplay}</td></tr>`;
         });
         html += `</tbody></table>`;
 
         // Group stats - exclude non-attendees
         const normVals = studentList.filter(s => !nonAttendees.has(s)).map(s => normalised[s]);
-        const normMeanVals = studentList.filter(s => !nonAttendees.has(s)).map(s => normalisedMean[s]);
-        const intMeanOfMedianScores = normVals.length ? normVals.reduce((a,b)=>a+b,0)/normVals.length : 0;
-        const intMeanOfMeanScores = normMeanVals.length ? normMeanVals.reduce((a,b)=>a+b,0)/normMeanVals.length : 0;
-        const sortedVals = [...normVals].sort((a,b)=>a-b);
-        const sortedMeanVals = [...normMeanVals].sort((a,b)=>a-b);
-        const finalMedianOfMedian = sortedVals.length ? sortedVals[Math.floor(sortedVals.length/2)] : 0;
-        const finalMedianOfMean = sortedMeanVals.length ? sortedMeanVals[Math.floor(sortedMeanVals.length/2)] : 0;
-        html += `<p><b>Normalised group mean:</b> ${intMeanOfMedianScores.toFixed(2)} (median-based) &nbsp;|&nbsp; ${intMeanOfMeanScores.toFixed(2)} (mean-based)<br><b>Normalised group median:</b> ${finalMedianOfMedian} (median-based) &nbsp;|&nbsp; ${finalMedianOfMean} (mean-based)</p>`;
+        const grpMean = normVals.length ? normVals.reduce((a,b)=>a+b,0)/normVals.length : 0;
+        const grpMedian = normVals.length ? [...normVals].sort((a,b)=>a-b)[Math.floor(normVals.length/2)] : 0;
+        html += `<p><b>Group mean (normalised):</b> ${grpMean.toFixed(2)} &nbsp;|&nbsp; <b>Group median (normalised):</b> ${grpMedian}</p>`;
 
         html += `<h2>Individual Feedback</h2>`;
         studentList.forEach(student => {
@@ -565,7 +544,7 @@ Group Mean: 4.67   Median: 5</code></pre>
             if (nonAttendees.has(student)) {
                 html += `<p><b>Score:</b> 0 <em>(Did not attend - excluded from group normalisation)</em></p>`;
             } else {
-                html += `<p><b>Median score:</b> ${normalised[student]} &nbsp;|&nbsp; <b>Mean score:</b> ${normalisedMean[student]}</p>`;
+                html += `<p><b>Score:</b> ${normalised[student]}</p>`;
             }
             if (comments[student].length) {
                 html += `<b>Peer Comments:</b><ul>`;
