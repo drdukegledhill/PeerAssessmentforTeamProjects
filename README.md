@@ -147,7 +147,7 @@ This tool does not ask students to grade peers in the way a lecturer grades an e
 
 Because the numbers have no fixed external meaning, the system cannot simply use them as-is. The peer comments students provide alongside their ratings are not an afterthought - giving structured feedback on a colleague's contribution is itself a learning activity (Liu & Carless, 2006).
 
-> Conway, R., Kember, D., Sivan, A., & Wu, M. (1993). Peer assessment of an individual's contribution to a group project. *Assessment & Evaluation in Higher Education, 18*(1), 45–56. https://doi.org/10.1080/0260293930180105 - Directly supports the relative contribution model: peer ratings as rankings within a team rather than absolute grades.
+> Conway, R., Kember, D., Sivan, A., & Wu, M. (1993). Peer assessment of an individual's contribution to a group project. *Assessment & Evaluation in Higher Education, 18*(1), 45–56. https://hdl.handle.net/102.100.100/560694 - Directly supports the relative contribution model: peer ratings as rankings within a team rather than absolute grades.
 >
 > Falchikov, N., & Goldfinch, J. (2000). Student peer assessment in higher education: A meta-analysis comparing peer and teacher marks. *Review of Educational Research, 70*(3), 287–322. https://doi.org/10.3102/00346543070003287 - Meta-analytic evidence for the validity and reliability of peer contribution ratings.
 >
@@ -166,7 +166,7 @@ Without normalisation, a student in Team A would receive a much higher score tha
 
 > Cheng, W., & Warren, M. (2000). Making a difference: Using peers to assess individual students' contributions to a group project. *Teaching in Higher Education, 5*(2), 243–255. https://doi.org/10.1080/135625100114885 - Addresses the comparability problem across groups with different rating cultures and the case for normalisation.
 >
-> Lejk, M., & Wyvill, M. (2001). The effect of the inclusion of self-assessment with peer assessment of contributions to a group project: A quantitative study of secret and agreed assessments. *Assessment & Evaluation in Higher Education, 26*(6), 551–561. https://doi.org/10.1080/02602930120093728 - Examines how group rating tendencies affect scores and the rationale for adjustment mechanisms.
+> Lejk, M., & Wyvill, M. (2001). The effect of the inclusion of self-assessment with peer assessment of contributions to a group project: A quantitative study of secret and agreed assessments. *Assessment & Evaluation in Higher Education, 26*(6), 551–561. https://www.tandfonline.com/doi/abs/10.1080/02602930120093887 - Examines how group rating tendencies affect scores and the rationale for adjustment mechanisms.
 
 ### Common student concerns
 
@@ -174,7 +174,7 @@ Without normalisation, a student in Team A would receive a much higher score tha
 
 Multiple peers rated that person, and their raw average across all peer ratings was calculated (excluding self-assessment; Sluijsmans et al., 1999; Topping, 1998). If they received a 6 from one rater but lower scores from others, their raw average was pulled down by those other ratings. And if the team's median was above 5 - because the team rated generously overall - the adjustment brought scores down further. Each individual rating is one honest data point; the result reflects what the group collectively observed, corrected for the team's rating tendencies.
 
-> Sluijsmans, D., Dochy, F., & Moerkerke, G. (1999). Creating a learning environment by using self-, peer-, and co-assessment. *Learning Environments Research, 1*(3), 293–319. https://doi.org/10.1023/A:1009932704688 - Distinguishes self-assessment from peer assessment and provides methodological justification for excluding self-ratings from calculations.
+> Sluijsmans, D., Dochy, F., & Moerkerke, G. (1999). Creating a learning environment by using self-, peer-, and co-assessment. *Learning Environments Research, 1*(3), 293–319. https://link.springer.com/article/10.1023/A:1009932704458 - Distinguishes self-assessment from peer assessment and provides methodological justification for excluding self-ratings from calculations.
 >
 > Topping, K. (1998). Peer assessment between students in colleges and universities. *Review of Educational Research, 68*(3), 249–276. https://doi.org/10.3102/00346543068003249 - Widely cited review recommending self-assessments be treated separately from peer ratings due to self-serving bias.
 
@@ -182,7 +182,7 @@ Multiple peers rated that person, and their raw average across all peer ratings 
 
 A rating of 2 on a 1 to 9 scale is a very low relative assessment - it signals serious concern about contribution. When the group median is above 5, the downward adjustment can push a raw average of 2 below zero, which is clamped to 0. This is a direct consequence of the normalisation formula: the same group-level adjustment that protects well-contributing students from generous rating cultures will push already very low scores further down (Lejk & Wyvill, 2001). The system is not inventing a punishment; it is faithfully reflecting that this student was rated very poorly relative to the team norm.
 
-> Lejk, M., & Wyvill, M. (2001). The effect of the inclusion of self-assessment with peer assessment of contributions to a group project: A quantitative study of secret and agreed assessments. *Assessment & Evaluation in Higher Education, 26*(6), 551–561. https://doi.org/10.1080/02602930120093728 - Examines how group-level normalisation adjustments affect individual scores across the distribution, including for low-scoring students.
+> Lejk, M., & Wyvill, M. (2001). The effect of the inclusion of self-assessment with peer assessment of contributions to a group project: A quantitative study of secret and agreed assessments. *Assessment & Evaluation in Higher Education, 26*(6), 551–561. https://www.tandfonline.com/doi/abs/10.1080/02602930120093887 - Examines how group-level normalisation adjustments affect individual scores across the distribution, including for low-scoring students.
 
 **"What if we all agree to give everyone a 6 or 7?"**
 
@@ -190,7 +190,7 @@ If every student gives every other student a 7, every student's raw average is 7
 
 This is not a bug - it is a core feature. The system is resistant to collusion. Inflating ratings does not help anyone; it only tells the assessor that the team felt uncomfortable differentiating. The pedagogical purpose of peer assessment is to give students a voice in recognising differential contribution within a team (Brooks & Ammons, 2003; Falchikov, 1995). Surrendering that voice by agreeing on uniform scores defeats the purpose entirely.
 
-> Brooks, C. M., & Ammons, J. L. (2003). Free riding and the lessons of classroom experience. *Journal of Education for Business, 78*(4), 217–220. https://doi.org/10.1080/08832320309598606 - Supports the necessity of differentiated peer assessment to surface free-rider problems in group work.
+> Brooks, C. M., & Ammons, J. L. (2003). Free riding and the lessons of classroom experience. *Journal of Education for Business, 78*(4), 217–220. https://www.tandfonline.com/doi/abs/10.1080/08832320309598613 - Supports the necessity of differentiated peer assessment to surface free-rider problems in group work.
 >
 > Falchikov, N. (1995). Peer feedback marking: Developing peer assessment. *Innovations in Education and Training International, 32*(2), 175–187. https://doi.org/10.1080/1355800950320212 - Addresses student collusion strategies (uniform scoring) and the requirement for system design to be robust to them.
 
@@ -220,7 +220,7 @@ Final scores are rounded using banker's rounding (round half to even) rather tha
 >
 > Knuth, D. E. (1997). *The art of computer programming, Vol. 2: Seminumerical algorithms* (3rd ed.). Addison-Wesley. - Section 4.2.2 analyses rounding modes and demonstrates that round-to-even minimises cumulative rounding error across large sets of numerical values.
 
-> The key question to ask when rating: compared to what an average member of this team contributed, did this person contribute more, the same, or less? A score of 5 means average for the team. The numbers only matter relative to each other - not in absolute terms.
+**The key question to ask when rating:** compared to what an average member of this team contributed, did this person contribute more, the same, or less? A score of 5 means average for the team. The numbers only matter relative to each other - not in absolute terms.
 
 ## Licence
 
