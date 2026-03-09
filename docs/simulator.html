@@ -60,6 +60,8 @@
             accent-color: var(--blue);
             cursor: pointer;
             height: 6px;
+            position: relative;
+            z-index: 1;
         }
 
         .slider-wrap {
@@ -74,6 +76,32 @@
             white-space: nowrap;
         }
 
+        /* Track wrapper holds slider + median line */
+        .slider-track-wrap {
+            flex: 1;
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .slider-track-wrap input[type="range"] {
+            width: 100%;
+        }
+
+        .median-line {
+            position: absolute;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            width: 3px;
+            height: 22px;
+            background: var(--blue);
+            opacity: 0.45;
+            pointer-events: none;
+            border-radius: 2px;
+            transition: left 0.12s ease;
+            z-index: 0;
+        }
+
         .rating-val {
             font-weight: bold;
             color: var(--blue);
@@ -82,20 +110,30 @@
             text-align: center;
         }
 
+        .rating-val.is-dna {
+            color: var(--text-muted);
+        }
+
         .score-badge {
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            width: 2.1em;
+            width: 2.4em;
             height: 2.1em;
-            border-radius: 50%;
+            border-radius: 0.4em;
             font-weight: bold;
-            font-size: 1.05em;
+            font-size: 1em;
         }
 
         .score-high { background: #dcfce7; color: #166534; }
         .score-mid  { background: var(--blue-light); color: var(--blue); }
         .score-low  { background: #fee2e2; color: #991b1b; }
+        .score-dna  { background: #f1f5f9; color: var(--text-muted); font-size: 0.82em; }
+
+        /* Dim entire row when DNA */
+        tr.row-dna td { opacity: 0.5; }
+        tr.row-dna td:first-child,
+        tr.row-dna td:last-child { opacity: 1; }
 
         /* Stat row */
         .stat-row {
@@ -133,7 +171,7 @@
 
 <header>
     <div class="container">
-        <h1>Peer Assessment Simulator <span class="version">v1.0</span></h1>
+        <h1>Peer Assessment Simulator <span class="version">v1.1</span></h1>
         <p class="subtitle">Enter your team members' names and experiment with ratings to see how normalisation works in real time.</p>
     </div>
 </header>
@@ -158,13 +196,13 @@
         </div>
 
         <h2 style="margin-top: 1.25em;">Your ratings</h2>
-        <p>Drag each slider to set your rating for that team member. A score of 5 means average contribution for the team - higher means they contributed more, lower means less. Results update instantly.</p>
+        <p>Drag each slider to set your rating (0 = did not attend / DNA, 1-9 = contribution level, 5 = average). The <strong>blue line</strong> marks the current group median across all sliders. Results update instantly.</p>
 
         <table id="rating-table">
             <thead>
                 <tr>
                     <th style="width: 22%">Team member</th>
-                    <th>Your rating (1-9)</th>
+                    <th>Your rating (0-9)</th>
                     <th style="width: 6%; text-align: center">Value</th>
                     <th style="width: 18%; text-align: center">Normalised score</th>
                 </tr>
@@ -174,7 +212,7 @@
 
         <div class="stat-row">
             <div class="stat-box">
-                <div class="stat-label">Group median (raw)</div>
+                <div class="stat-label">Group median (raw, excl. DNA)</div>
                 <div class="stat-value" id="stat-median">-</div>
             </div>
             <div class="stat-box">
@@ -188,7 +226,7 @@
         </div>
 
         <p style="font-size: 0.9em; color: var(--text-muted); margin-top: 0.5em;">
-            The <strong>group median</strong> is the middle value of your ratings when sorted. The <strong>adjustment</strong> is how much is added to every score so the median lands on 5. Each normalised score = your rating + adjustment, rounded and clamped to 0-9.
+            The <strong>blue line</strong> shows where the group median sits on each slider track. The <strong>adjustment</strong> shifts all non-DNA scores so that median lands on 5. Students rated 0 are flagged as DNA and excluded from the median calculation.
         </p>
 
         <div style="margin-top: 1.25em; display: flex; gap: 0.75em; flex-wrap: wrap;">
@@ -200,9 +238,10 @@
         <h2>Things to try</h2>
         <ul>
             <li><strong>Give everyone the same rating</strong> (e.g. all 7s) - notice that everyone still ends up with 5. Inflation cancels out completely.</li>
-            <li><strong>Give one person a much lower rating</strong> - see how it affects the group median, and therefore everyone else's score.</li>
+            <li><strong>Slide one person to 0</strong> - watch them get flagged as DNA and removed from the group median. See how the remaining scores shift.</li>
+            <li><strong>Give one person a much lower rating</strong> - see how it drags the group median down, and therefore lifts everyone else's score.</li>
             <li><strong>Try a wide spread</strong> (e.g. 2, 5, 7, 9) versus a narrow spread (e.g. 4, 5, 6) - the adjustment will be the same but the spread of outcomes differs.</li>
-            <li><strong>Give someone a 1</strong> - watch how the normalised score responds, particularly when the group median is high.</li>
+            <li><strong>Give someone a 1 or 2</strong> - watch the normalised score respond when the group median is high.</li>
         </ul>
     </section>
 
@@ -231,6 +270,18 @@
         return Math.round(n);
     }
 
+    // Calculate where a slider thumb sits as a % of the element width.
+    // Accounts for thumb half-width so the line stays visually aligned with the thumb.
+    function thumbPercent(slider, val) {
+        const min = parseFloat(slider.min);
+        const max = parseFloat(slider.max);
+        const w = slider.offsetWidth;
+        const thumbW = 16; // approximate browser default thumb width (px)
+        if (w <= thumbW) return (val - min) / (max - min) * 100;
+        const pct = (thumbW / 2 + (val - min) / (max - min) * (w - thumbW)) / w;
+        return pct * 100;
+    }
+
     function setupTeam() {
         const raw = document.getElementById('names-input').value;
         const names = raw.split(',').map(s => s.trim()).filter(s => s.length > 0);
@@ -252,12 +303,16 @@
         tbody.innerHTML = '';
         members.forEach((name, i) => {
             const tr = document.createElement('tr');
+            tr.id = `row-${i}`;
             tr.innerHTML = `
                 <td>${name}</td>
                 <td>
                     <div class="slider-wrap">
-                        <span class="endpoint">1</span>
-                        <input type="range" min="1" max="9" value="5" id="slider-${i}" oninput="recalculate()">
+                        <span class="endpoint">0</span>
+                        <div class="slider-track-wrap" id="track-wrap-${i}">
+                            <input type="range" min="0" max="9" value="5" id="slider-${i}" oninput="recalculate()">
+                            <div class="median-line" id="median-line-${i}"></div>
+                        </div>
                         <span class="endpoint">9</span>
                     </div>
                 </td>
@@ -271,23 +326,65 @@
     function recalculate() {
         const ratings = members.map((_, i) => {
             const v = parseInt(document.getElementById(`slider-${i}`).value);
-            document.getElementById(`val-${i}`).textContent = v;
+            const valEl = document.getElementById(`val-${i}`);
+            valEl.textContent = v;
+            valEl.className = v === 0 ? 'rating-val is-dna' : 'rating-val';
             return v;
         });
 
-        // Median - same method as the Python tool: sorted[floor(n/2)]
-        const sorted = [...ratings].sort((a, b) => a - b);
-        const median = sorted[Math.floor(sorted.length / 2)];
-        const adjustment = 5 - median;
+        // DNA = rating of 0 (excluded from median, same as main tool)
+        const attendeeRatings = ratings.filter(r => r > 0);
+        const hasAttendees = attendeeRatings.length > 0;
 
-        document.getElementById('stat-median').textContent = median;
-        document.getElementById('stat-adj').textContent = (adjustment >= 0 ? '+' : '') + adjustment;
+        // Median using same method as Python: sorted[floor(n/2)]
+        let median = null;
+        let adjustment = 0;
+        if (hasAttendees) {
+            const sorted = [...attendeeRatings].sort((a, b) => a - b);
+            median = sorted[Math.floor(sorted.length / 2)];
+            adjustment = 5 - median;
+        }
 
+        // Update stat boxes
+        document.getElementById('stat-median').textContent = median !== null ? median : 'N/A';
+        document.getElementById('stat-adj').textContent = median !== null
+            ? (adjustment >= 0 ? '+' : '') + adjustment
+            : 'N/A';
+
+        // Update each row
         ratings.forEach((r, i) => {
-            const score = Math.max(0, Math.min(9, bankersRound(r + adjustment)));
             const badge = document.getElementById(`score-${i}`);
-            badge.textContent = score;
-            badge.className = 'score-badge ' + (score >= 6 ? 'score-high' : score <= 3 ? 'score-low' : 'score-mid');
+            const row = document.getElementById(`row-${i}`);
+
+            if (r === 0) {
+                // DNA
+                badge.textContent = 'DNA';
+                badge.className = 'score-badge score-dna';
+                row.className = 'row-dna';
+            } else {
+                row.className = '';
+                if (median !== null) {
+                    const score = Math.max(0, Math.min(9, bankersRound(r + adjustment)));
+                    badge.textContent = score;
+                    badge.className = 'score-badge ' + (score >= 6 ? 'score-high' : score <= 3 ? 'score-low' : 'score-mid');
+                } else {
+                    badge.textContent = '-';
+                    badge.className = 'score-badge score-mid';
+                }
+            }
+        });
+
+        // Update median line positions on all sliders
+        members.forEach((_, i) => {
+            const slider = document.getElementById(`slider-${i}`);
+            const line = document.getElementById(`median-line-${i}`);
+            if (!slider || !line) return;
+            if (median !== null) {
+                line.style.left = thumbPercent(slider, median) + '%';
+                line.style.display = 'block';
+            } else {
+                line.style.display = 'none';
+            }
         });
     }
 
@@ -304,6 +401,8 @@
     });
     document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('reset-btn').addEventListener('click', resetTeam);
+        // Recalculate median lines on resize so thumb positions stay accurate
+        window.addEventListener('resize', recalculate);
     });
 </script>
 
