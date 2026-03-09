@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Peer Assessment Simulator</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .name-row {
+            display: flex;
+            gap: 0.75em;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .name-row input[type="text"] {
+            flex: 1;
+            min-width: 200px;
+            font-size: 1em;
+            padding: 0.5em 0.75em;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            outline: none;
+            font-family: inherit;
+        }
+
+        .name-row input[type="text"]:focus {
+            border-color: var(--blue);
+            box-shadow: 0 0 0 2px rgba(1,57,118,0.1);
+        }
+
+        .btn {
+            background: var(--blue);
+            color: #fff;
+            border: none;
+            border-radius: var(--radius);
+            padding: 0.55em 1.4em;
+            font-size: 1em;
+            font-weight: bold;
+            cursor: pointer;
+            font-family: inherit;
+            transition: background 0.15s;
+        }
+
+        .btn:hover { background: var(--blue-dark); }
+
+        .btn-outline {
+            background: none;
+            color: var(--blue);
+            border: 2px solid var(--blue);
+        }
+
+        .btn-outline:hover { background: var(--blue-light); }
+
+        /* Rating table */
+        #rating-table td { vertical-align: middle; padding: 10px 12px; }
+
+        input[type="range"] {
+            width: 100%;
+            accent-color: var(--blue);
+            cursor: pointer;
+            height: 6px;
+        }
+
+        .slider-wrap {
+            display: flex;
+            align-items: center;
+            gap: 0.75em;
+        }
+
+        .slider-wrap span.endpoint {
+            font-size: 0.78em;
+            color: var(--text-muted);
+            white-space: nowrap;
+        }
+
+        .rating-val {
+            font-weight: bold;
+            color: var(--blue);
+            font-size: 1.15em;
+            min-width: 1.4em;
+            text-align: center;
+        }
+
+        .score-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 2.1em;
+            height: 2.1em;
+            border-radius: 50%;
+            font-weight: bold;
+            font-size: 1.05em;
+        }
+
+        .score-high { background: #dcfce7; color: #166534; }
+        .score-mid  { background: var(--blue-light); color: var(--blue); }
+        .score-low  { background: #fee2e2; color: #991b1b; }
+
+        /* Stat row */
+        .stat-row {
+            display: flex;
+            gap: 1em;
+            flex-wrap: wrap;
+            margin: 1.25em 0 0.5em;
+        }
+
+        .stat-box {
+            flex: 1;
+            min-width: 110px;
+            background: var(--blue-light);
+            border-radius: var(--radius);
+            padding: 0.75em 1em;
+            text-align: center;
+        }
+
+        .stat-label {
+            font-size: 0.8em;
+            color: var(--text-muted);
+            margin-bottom: 0.2em;
+        }
+
+        .stat-value {
+            font-size: 1.6em;
+            font-weight: bold;
+            color: var(--blue);
+        }
+
+        #rating-section { display: none; }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="container">
+        <h1>Peer Assessment Simulator <span class="version">v1.0</span></h1>
+        <p class="subtitle">Enter your team members' names and experiment with ratings to see how normalisation works in real time.</p>
+    </div>
+</header>
+
+<div class="container">
+
+    <section class="docs-section">
+        <h2>Set up your team</h2>
+        <p>Enter the names of your <strong>team members</strong> - do not include yourself. You are the rater here, not the rated.</p>
+        <div class="name-row">
+            <input type="text" id="names-input" placeholder="e.g. Alice, Bob, Charlie, Diana" />
+            <button class="btn" id="setup-btn">Set up team</button>
+        </div>
+        <p class="upload-hint" style="text-align: left; margin-top: 0.6em;">Separate names with commas. Enter at least 2 people.</p>
+    </section>
+
+    <section class="docs-section" id="rating-section">
+
+        <div class="tip">
+            <strong>Simulation only - not your actual scores.</strong>
+            This tool processes only your ratings. In the real assessment, each person's score is the average of ratings from <em>all</em> their peers, and normalisation is applied to those averaged scores. What this simulator shows is: <em>if everyone on your team rated exactly as you are rating here, these would be the resulting normalised scores.</em> Use it to understand how normalisation works - not to predict your final result.
+        </div>
+
+        <h2 style="margin-top: 1.25em;">Your ratings</h2>
+        <p>Drag each slider to set your rating for that team member. A score of 5 means average contribution for the team - higher means they contributed more, lower means less. Results update instantly.</p>
+
+        <table id="rating-table">
+            <thead>
+                <tr>
+                    <th style="width: 22%">Team member</th>
+                    <th>Your rating (1-9)</th>
+                    <th style="width: 6%; text-align: center">Value</th>
+                    <th style="width: 18%; text-align: center">Normalised score</th>
+                </tr>
+            </thead>
+            <tbody id="rating-tbody"></tbody>
+        </table>
+
+        <div class="stat-row">
+            <div class="stat-box">
+                <div class="stat-label">Group median (raw)</div>
+                <div class="stat-value" id="stat-median">-</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label">Normalisation adjustment</div>
+                <div class="stat-value" id="stat-adj">-</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label">Target</div>
+                <div class="stat-value">5</div>
+            </div>
+        </div>
+
+        <p style="font-size: 0.9em; color: var(--text-muted); margin-top: 0.5em;">
+            The <strong>group median</strong> is the middle value of your ratings when sorted. The <strong>adjustment</strong> is how much is added to every score so the median lands on 5. Each normalised score = your rating + adjustment, rounded and clamped to 0-9.
+        </p>
+
+        <div style="margin-top: 1.25em; display: flex; gap: 0.75em; flex-wrap: wrap;">
+            <button class="btn btn-outline" id="reset-btn">Change names</button>
+        </div>
+    </section>
+
+    <section class="docs-section">
+        <h2>Things to try</h2>
+        <ul>
+            <li><strong>Give everyone the same rating</strong> (e.g. all 7s) - notice that everyone still ends up with 5. Inflation cancels out completely.</li>
+            <li><strong>Give one person a much lower rating</strong> - see how it affects the group median, and therefore everyone else's score.</li>
+            <li><strong>Try a wide spread</strong> (e.g. 2, 5, 7, 9) versus a narrow spread (e.g. 4, 5, 6) - the adjustment will be the same but the spread of outcomes differs.</li>
+            <li><strong>Give someone a 1</strong> - watch how the normalised score responds, particularly when the group median is high.</li>
+        </ul>
+    </section>
+
+</div>
+
+<footer>
+    <div class="container">
+        <a href="index.html">Back to main tool</a>
+        &bull;
+        &copy; Dr Duke Gledhill 2026 - University of Huddersfield<br>
+        Licensed under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank" rel="noopener">CC BY-NC-SA 4.0</a>
+        &bull;
+        <a href="https://github.com/drdukegledhill/PeerAssessmentforTeamProjects" target="_blank" rel="noopener">GitHub</a>
+    </div>
+</footer>
+
+<script>
+    let members = [];
+
+    function bankersRound(n) {
+        const floor = Math.floor(n);
+        const frac = n - floor;
+        if (Math.abs(frac - 0.5) < 1e-10) {
+            return floor % 2 === 0 ? floor : floor + 1;
+        }
+        return Math.round(n);
+    }
+
+    function setupTeam() {
+        const raw = document.getElementById('names-input').value;
+        const names = raw.split(',').map(s => s.trim()).filter(s => s.length > 0);
+
+        if (names.length < 2) {
+            alert('Please enter at least 2 team members, separated by commas.');
+            return;
+        }
+
+        members = names;
+        buildTable();
+        document.getElementById('rating-section').style.display = 'block';
+        document.getElementById('rating-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        recalculate();
+    }
+
+    function buildTable() {
+        const tbody = document.getElementById('rating-tbody');
+        tbody.innerHTML = '';
+        members.forEach((name, i) => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${name}</td>
+                <td>
+                    <div class="slider-wrap">
+                        <span class="endpoint">1</span>
+                        <input type="range" min="1" max="9" value="5" id="slider-${i}" oninput="recalculate()">
+                        <span class="endpoint">9</span>
+                    </div>
+                </td>
+                <td style="text-align:center"><span class="rating-val" id="val-${i}">5</span></td>
+                <td style="text-align:center"><span class="score-badge score-mid" id="score-${i}">5</span></td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+
+    function recalculate() {
+        const ratings = members.map((_, i) => {
+            const v = parseInt(document.getElementById(`slider-${i}`).value);
+            document.getElementById(`val-${i}`).textContent = v;
+            return v;
+        });
+
+        // Median - same method as the Python tool: sorted[floor(n/2)]
+        const sorted = [...ratings].sort((a, b) => a - b);
+        const median = sorted[Math.floor(sorted.length / 2)];
+        const adjustment = 5 - median;
+
+        document.getElementById('stat-median').textContent = median;
+        document.getElementById('stat-adj').textContent = (adjustment >= 0 ? '+' : '') + adjustment;
+
+        ratings.forEach((r, i) => {
+            const score = Math.max(0, Math.min(9, bankersRound(r + adjustment)));
+            const badge = document.getElementById(`score-${i}`);
+            badge.textContent = score;
+            badge.className = 'score-badge ' + (score >= 6 ? 'score-high' : score <= 3 ? 'score-low' : 'score-mid');
+        });
+    }
+
+    function resetTeam() {
+        document.getElementById('rating-section').style.display = 'none';
+        members = [];
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        document.getElementById('names-input').focus();
+    }
+
+    document.getElementById('setup-btn').addEventListener('click', setupTeam);
+    document.getElementById('names-input').addEventListener('keydown', e => {
+        if (e.key === 'Enter') setupTeam();
+    });
+    document.addEventListener('DOMContentLoaded', () => {
+        document.getElementById('reset-btn').addEventListener('click', resetTeam);
+    });
+</script>
+
+</body>
+</html>
