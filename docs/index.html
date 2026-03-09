@@ -327,8 +327,14 @@ Group Mean: 4.67   Median: 5</code></pre>
     window.addEventListener('load', handleHash);
     window.addEventListener('hashchange', handleHash);
 
-    // Scroll-spy: highlight nav link for the most visible section
+    // Scroll-spy: highlight nav link for the most visible section.
+    // Only activates after the user has scrolled, so page load / refresh
+    // does not spuriously update the hash from already-visible sections.
+    let hasScrolled = false;
+    window.addEventListener('scroll', () => { hasScrolled = true; }, { passive: true, once: true });
+
     const scrollObserver = new IntersectionObserver(entries => {
+        if (!hasScrolled) return;
         entries.forEach(entry => {
             if (entry.isIntersecting) {
                 const id = entry.target.id;
