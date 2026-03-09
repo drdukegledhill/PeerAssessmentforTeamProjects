@@ -350,7 +350,10 @@ Group Mean: 4.67   Median: 5</code></pre>
                 activateNavLink(id);
             }
         });
-    }, { threshold: 0.3 });
+    // rootMargin creates a narrow band just below the sticky nav to the viewport
+    // midpoint. Only the section whose top enters that band fires, so multiple
+    // short sections visible at once don't all compete to set the active link.
+    }, { rootMargin: '-50px 0px -50% 0px', threshold: 0 });
 
     sectionIds.forEach(id => {
         const el = document.getElementById(id);
