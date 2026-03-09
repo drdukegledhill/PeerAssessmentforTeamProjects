@@ -128,47 +128,50 @@ def calculate_scores(data, students, name_col):
 
 def normalize_scores(raw_avgs, all_scores, target=5, non_attendees=None):
     """
-    Normalise scores so group median centres around target value.
-    Non-attendees (all-zero scores) are excluded from the reference calculation.
+    Normalise scores using both median and mean as the group reference.
+    Non-attendees (all-zero scores) are excluded from both reference calculations.
 
     Args:
         raw_avgs: Dict of raw average scores per student
         all_scores: List of all individual scores (unused, kept for compatibility)
-        target: Target value to centre the group median around (default: 5)
-        non_attendees: Set of student names to exclude from the median reference
+        target: Target value to centre the group around (default: 5)
+        non_attendees: Set of student names to exclude from the reference calculation
 
     Returns:
-        Tuple of (normalised scores dict, group_median, adjustment value)
+        Tuple of (normalised_median dict, normalised_mean dict,
+                  group_median, median_adjustment, group_mean, mean_adjustment)
     """
     if non_attendees is None:
         non_attendees = set()
 
-    # Handle empty data case
     if not raw_avgs:
-        return {}, 0, 0
+        return {}, {}, 0, 0, 0, 0
 
-    # Use the median of attendee raw averages as the normalisation reference.
-    # Median is robust to outliers; non-attendees are excluded so a student
-    # who received all zeros doesn't compress the rest of the group upward.
     attendee_avgs = [v for k, v in raw_avgs.items() if k not in non_attendees]
     if not attendee_avgs:
-        return {k: 0 for k in raw_avgs}, 0, 0
+        empty = {k: 0 for k in raw_avgs}
+        return empty, empty, 0, 0, 0, 0
 
     sorted_avgs = sorted(attendee_avgs)
     group_median = sorted_avgs[len(sorted_avgs) // 2]
-    adjustment = target - group_median
+    median_adjustment = target - group_median
 
-    normalised = {}
+    group_mean = sum(attendee_avgs) / len(attendee_avgs)
+    mean_adjustment = target - group_mean
+
+    normalised_median = {}
+    normalised_mean = {}
     for student, raw in raw_avgs.items():
         if student in non_attendees:
-            normalised[student] = 0
+            normalised_median[student] = 0
+            normalised_mean[student] = 0
         else:
-            norm_score = raw + adjustment
-            norm_score = round(norm_score)
-            norm_score = max(0, min(9, norm_score))
-            normalised[student] = norm_score
+            med_score = max(0, min(9, round(raw + median_adjustment)))
+            mean_score = max(0, min(9, round(raw + mean_adjustment)))
+            normalised_median[student] = med_score
+            normalised_mean[student] = mean_score
 
-    return normalised, group_median, adjustment
+    return normalised_median, normalised_mean, group_median, median_adjustment, group_mean, mean_adjustment
 
 
 def extract_comments(data, students, name_col):
@@ -209,91 +212,93 @@ def extract_comments(data, students, name_col):
     return comments
 
 
-def generate_report(students, raw_avgs, normalised, comments, group_mean, adjustment, non_attendees=None, title="PEER ASSESSMENT REPORT"):
+def generate_report(students, raw_avgs, normalised_median, normalised_mean, comments,
+                    group_median, median_adjustment, group_mean, mean_adjustment,
+                    non_attendees=None, title="PEER ASSESSMENT REPORT"):
     """
     Generate and print the full peer assessment report.
-    
+
     Args:
         students: Dict of student names and their column indices
         raw_avgs: Dict of raw average scores per student
-        normalised: Dict of normalised final scores per student
+        normalised_median: Dict of median-normalised final scores per student
+        normalised_mean: Dict of mean-normalised final scores per student
         comments: Dict mapping students to their received comments
-        group_mean: The calculated group median before normalisation
-        adjustment: The normalisation adjustment applied
+        group_median: The group median of raw averages used for normalisation
+        median_adjustment: The median-based normalisation adjustment applied
+        group_mean: The group mean of raw averages used for normalisation
+        mean_adjustment: The mean-based normalisation adjustment applied
         non_attendees: Set of student names flagged as did-not-attend
         title: Title for the report header
     """
     if non_attendees is None:
         non_attendees = set()
 
-    # Keep students in original order from CSV (Python dicts preserve insertion order)
     student_list = list(students.keys())
-    
-    # Print report header with decorative border
-    print("=" * 70)
+
+    print("=" * 80)
     print(title)
-    print("=" * 70)
+    print("=" * 80)
     print()
-    
-    # Print summary statistics
+
+    # Summary statistics - show both reference points side by side
     print(f"Total students: {len(students)}")
-    print(f"Group median (raw): {group_mean:.2f}")  # .2f formats to 2 decimal places
-    print(f"Normalisation adjustment: {adjustment:+.2f}")  # +.2f shows sign (+/-)
-    print(f"Target: 5")
+    print(f"{'':30}{'Median-based':>16}{'Mean-based':>16}")
+    print(f"{'Group reference (raw):':<30}{group_median:>16.2f}{group_mean:>16.2f}")
+    print(f"{'Normalisation adjustment:':<30}{median_adjustment:>+16.2f}{mean_adjustment:>+16.2f}")
+    print(f"{'Target:':<30}{'5':>16}{'5':>16}")
     print()
-    
-    # Print summary table header
-    print("-" * 70)
+
+    # Summary table
+    print("-" * 80)
     print("SUMMARY TABLE")
-    print("-" * 70)
-    # Format column headers with specific widths: <6 left-align 6 chars, >12 right-align 12 chars
-    print(f"{'#':<6}{'Student':<30}{'Raw Avg':>12}{'Score':>12}")
-    print("-" * 70)
-    
-    # Print each student's row in the summary table
-    for num, student in enumerate(student_list, 1):  # enumerate starting at 1 for numbering
-        score_display = "DNA" if student in non_attendees else str(normalised[student])
-        print(f"{num:<6}{student:<30}{raw_avgs[student]:>12.2f}{score_display:>12}")
-    
-    print("-" * 70)
-    
-    # Calculate and display group statistics for normalised scores (excluding non-attendees)
-    attendee_scores = [v for k, v in normalised.items() if k not in non_attendees]
-    int_mean = sum(attendee_scores) / len(attendee_scores) if attendee_scores else 0
-    sorted_vals = sorted(attendee_scores)
-    # Calculate median (middle value of sorted list)
-    median = sorted_vals[len(sorted_vals) // 2] if sorted_vals else 0
-    
-    # Print group statistics aligned with the Score column
-    print(f"{'':36}{'Group Mean:':>12}{int_mean:>12.2f}")
-    print(f"{'':36}{'Median:':>12}{median:>12}")
+    print("-" * 80)
+    print(f"{'#':<6}{'Student':<30}{'Raw Avg':>12}{'Median Score':>16}{'Mean Score':>16}")
+    print("-" * 80)
+
+    for num, student in enumerate(student_list, 1):
+        med_display = "DNA" if student in non_attendees else str(normalised_median[student])
+        mean_display = "DNA" if student in non_attendees else str(normalised_mean[student])
+        print(f"{num:<6}{student:<30}{raw_avgs[student]:>12.2f}{med_display:>16}{mean_display:>16}")
+
+    print("-" * 80)
+
+    # Group stats for normalised scores (excluding non-attendees)
+    att_med = [v for k, v in normalised_median.items() if k not in non_attendees]
+    att_mean = [v for k, v in normalised_mean.items() if k not in non_attendees]
+    grp_mean_med = sum(att_med) / len(att_med) if att_med else 0
+    grp_mean_mean = sum(att_mean) / len(att_mean) if att_mean else 0
+    sorted_med = sorted(att_med)
+    sorted_mean = sorted(att_mean)
+    grp_med_med = sorted_med[len(sorted_med) // 2] if sorted_med else 0
+    grp_med_mean = sorted_mean[len(sorted_mean) // 2] if sorted_mean else 0
+
+    print(f"{'Normalised group mean:':<46}{grp_mean_med:>16.2f}{grp_mean_mean:>16.2f}")
+    print(f"{'Normalised group median:':<46}{grp_med_med:>16}{grp_med_mean:>16}")
     print()
-    
-    # Print individual feedback section
-    print("=" * 70)
+
+    # Individual feedback
+    print("=" * 80)
     print("INDIVIDUAL FEEDBACK")
-    print("=" * 70)
-    
-    # Generate feedback block for each student
+    print("=" * 80)
+
     for student in student_list:
         print()
         print(f">>> {student}")
         if student in non_attendees:
-            print(f"    Score: 0 (Did not attend — excluded from group normalisation)")
+            print(f"    Score: 0 (Did not attend - excluded from group normalisation)")
         else:
-            print(f"    Score: {normalised[student]}")
+            print(f"    Median score: {normalised_median[student]}   |   Mean score: {normalised_mean[student]}")
         print()
-        
-        # Print peer comments if any exist
+
         if comments[student]:
             print("    Peer Comments:")
-            # Print each comment on its own line with a bullet point
             for comment in comments[student]:
                 print(f"    - {comment}")
         else:
             print("    Peer Comments: (No comments provided)")
         print()
-        print("-" * 70)
+        print("-" * 80)
 
 
 def main():
@@ -346,14 +351,17 @@ def main():
         print(f"Non-attendees detected (excluded from normalisation): {', '.join(non_attendees)}")
         print()
 
-    # Step 2: Normalise scores to centre around target (default 5)
-    normalised, group_mean, adjustment = normalize_scores(raw_avgs, all_scores, non_attendees=non_attendees)
+    # Step 2: Normalise scores using both median and mean as reference
+    normalised_median, normalised_mean, group_median, median_adjustment, group_mean, mean_adjustment = \
+        normalize_scores(raw_avgs, all_scores, non_attendees=non_attendees)
 
     # Step 3: Extract peer feedback comments
     comments = extract_comments(data, students, name_col)
 
     # Step 4: Generate and print the final report
-    generate_report(students, raw_avgs, normalised, comments, group_mean, adjustment, non_attendees=non_attendees)
+    generate_report(students, raw_avgs, normalised_median, normalised_mean, comments,
+                    group_median, median_adjustment, group_mean, mean_adjustment,
+                    non_attendees=non_attendees)
 
 
 # Standard Python idiom: only run main() if this script is executed directly
