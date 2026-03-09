@@ -187,6 +187,44 @@ Group median (normalised): 5</code></pre>
 
     <section class="docs-section" id="normalisation">
         <h2>🧮 How Normalisation Works</h2>
+
+        <h3>📋 The rating guide</h3>
+        <p>When students rate their teammates they choose a number from 0 to 9. Each choice has a defined meaning and a direct impact on how the team grade is weighted to produce an individual grade:</p>
+        <table>
+            <thead>
+                <tr>
+                    <th style="text-align:center; width:60px;">Choice</th>
+                    <th style="text-align:center; width:120px;">Impact on grade</th>
+                    <th>Meaning</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td style="text-align:center;"><strong>0</strong></td><td style="text-align:center;">Max &minus;30%</td><td>Contributed nothing to the project. Rarely used; treated as Did Not Attend.</td></tr>
+                <tr><td style="text-align:center;"><strong>1</strong></td><td style="text-align:center;">&minus;20%</td><td>Rare &ndash; a request to the module team that this member has significantly failed in their contribution. Not awarded automatically.</td></tr>
+                <tr><td style="text-align:center;"><strong>2</strong></td><td style="text-align:center;">&minus;15%</td><td>Rare &ndash; a request to the module team that this member has failed in their contribution. Not awarded automatically.</td></tr>
+                <tr><td style="text-align:center;"><strong>3</strong></td><td style="text-align:center;">&minus;10%</td><td>Contributed very poorly to the team.</td></tr>
+                <tr><td style="text-align:center;"><strong>4</strong></td><td style="text-align:center;">&minus;5%</td><td>Under performed in their contribution to the team.</td></tr>
+                <tr style="font-weight:bold;"><td style="text-align:center;"><strong>5</strong></td><td style="text-align:center;">Team grade</td><td>Performed adequately &ndash; receives the team grade unchanged.</td></tr>
+                <tr><td style="text-align:center;"><strong>6</strong></td><td style="text-align:center;">+5%</td><td>Was a valuable contributor to the team.</td></tr>
+                <tr><td style="text-align:center;"><strong>7</strong></td><td style="text-align:center;">+10%</td><td>Was instrumental in their contributions to the team.</td></tr>
+                <tr><td style="text-align:center;"><strong>8</strong></td><td style="text-align:center;">+15%</td><td>Rare &ndash; a request to the module team that this member made a discernible outstanding contribution. Not awarded automatically.</td></tr>
+                <tr><td style="text-align:center;"><strong>9</strong></td><td style="text-align:center;">+20%</td><td>Rare &ndash; a request to the module team that this member made a significant outstanding contribution. Not awarded automatically.</td></tr>
+            </tbody>
+        </table>
+        <p style="font-size:0.92em; color: var(--text-muted); margin-top:0.5em;">Choices 0&ndash;2 and 8&ndash;9 are not applied automatically &ndash; they are a request to the module team and will be reviewed before any adjustment is made.</p>
+
+        <h3>🔄 From vote to grade &ndash; the full flow</h3>
+        <ol class="steps">
+            <li>The team receives a grade for their project (e.g. 65%).</li>
+            <li>Each team member rates every other team member using the 0&ndash;9 scale above. <strong>Self-assessments are excluded</strong> from all calculations.</li>
+            <li>Each student&rsquo;s <strong>raw average</strong> is calculated &ndash; the mean of all the votes they received from peers.</li>
+            <li>The raw average is <strong>normalised</strong> &ndash; adjusted so the group as a whole centres on 5, regardless of whether the team rated generously or harshly. This produces the final score (0&ndash;9).</li>
+            <li>The final score <strong>maps to a grade adjustment</strong> using the table above (e.g. score 6 = +5%, score 4 = &minus;5%).</li>
+            <li>Individual grade = team grade &plusmn; that adjustment (e.g. 65% + 5% = 70%, or 65% &minus; 5% = 60%).</li>
+        </ol>
+        <div class="tip"><strong>Important:</strong> the grade adjustment is applied to the <em>final normalised score</em>, not the raw votes peers submitted. A peer giving a 6 does not automatically mean +5% &ndash; what matters is where the normalised score lands after the group adjustment.</div>
+
+        <h3>⚙️ The normalisation calculation</h3>
         <p>Raw peer scores are adjusted so that the group centres on 5, enabling fair comparison across teams with different rating tendencies (e.g. a generous team vs. a harsh team):</p>
         <ol class="steps">
             <li>All peer scores are collected, <strong>excluding self-assessments</strong> (a student&rsquo;s own rating of themselves).</li>

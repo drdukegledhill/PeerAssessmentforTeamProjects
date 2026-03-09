@@ -158,6 +158,38 @@ python3 pa_report.py "team1.csv"
 
 ## 🧮 Normalisation
 
+### 📋 The rating guide
+
+When students rate their teammates they choose a number from 0 to 9. Each choice has a defined meaning and a direct impact on how the team grade is weighted to produce an individual grade:
+
+| Choice | Impact on grade | Meaning |
+|:------:|:---------------:|---------|
+| **0** | Max −30% | Contributed nothing to the project. Rarely used; treated as Did Not Attend. |
+| **1** | −20% | Rare – a request to the module team that this member has significantly failed in their contribution. Not awarded automatically. |
+| **2** | −15% | Rare – a request to the module team that this member has failed in their contribution. Not awarded automatically. |
+| **3** | −10% | Contributed very poorly to the team. |
+| **4** | −5% | Under performed in their contribution to the team. |
+| **5** | Team grade | Performed adequately – receives the team grade unchanged. |
+| **6** | +5% | Was a valuable contributor to the team. |
+| **7** | +10% | Was instrumental in their contributions to the team. |
+| **8** | +15% | Rare – a request to the module team that this member made a discernible outstanding contribution. Not awarded automatically. |
+| **9** | +20% | Rare – a request to the module team that this member made a significant outstanding contribution. Not awarded automatically. |
+
+Choices 0–2 and 8–9 are not applied automatically – they are a request to the module team and will be reviewed before any adjustment is made.
+
+### 🔄 From vote to grade – the full flow
+
+1. The team receives a grade for their project (e.g. 65%).
+2. Each team member rates every other team member using the 0–9 scale above. Self-assessments are excluded from all calculations.
+3. Each student's **raw average** is calculated – the mean of all the votes they received from peers.
+4. The raw average is **normalised** – adjusted so the group as a whole centres on 5, regardless of whether the team rated generously or harshly. This produces the final score (0–9).
+5. The final score **maps to a grade adjustment** using the table above (e.g. score 6 = +5%, score 4 = −5%).
+6. Individual grade = team grade ± that adjustment (e.g. 65% + 5% = 70%, or 65% − 5% = 60%).
+
+> **Important:** the grade adjustment is applied to the *final normalised score*, not the raw votes peers submitted. A peer giving a 6 does not automatically mean +5% – what matters is where the normalised score lands after the group adjustment.
+
+### ⚙️ The normalisation calculation
+
 Scores are normalised so the group centres on 5, enabling fair comparison across teams with different rating tendencies:
 
 1. All peer scores are collected, excluding self-assessments.
