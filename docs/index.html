@@ -56,14 +56,56 @@
         .docs-section .upload-section {
             margin-bottom: 0;
         }
+        .upload-options {
+            display: flex;
+            gap: 1.5em;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 0.75em;
+        }
+        .upload-option {
+            flex: 1;
+            min-width: 220px;
+            max-width: 340px;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 1em 1.25em;
+            text-align: center;
+        }
+        .upload-option-label {
+            font-weight: bold;
+            color: var(--blue);
+            margin: 0 0 0.5em;
+            font-size: 0.97em;
+        }
+        .group-report {
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            margin-bottom: 1em;
+            box-shadow: var(--shadow);
+        }
+        .group-report > summary {
+            padding: 1em 1.25em;
+            border-bottom: none;
+            margin-bottom: 0;
+            font-size: 1em;
+        }
+        details.group-report[open] > summary {
+            border-bottom: 1px solid var(--border);
+        }
+        .group-report-body {
+            padding: 1.25em 1.5em;
+        }
     </style>
 </head>
 <body>
 
 <header>
     <div class="container">
-        <h1>Peer Assessment Report <span class="version">v2.1</span></h1>
-        <p class="subtitle">Upload a peer assessment CSV to instantly generate normalised scores and individual feedback - everything runs in your browser, no data is uploaded anywhere.</p>
+        <h1>Peer Assessment Report <span class="version">v2.2</span></h1>
+        <p class="subtitle">Upload a peer assessment CSV to instantly generate normalised scores and individual feedback. Upload multiple CSVs at once for a full cohort view. Everything runs in your browser &mdash; no data is uploaded anywhere.</p>
     </div>
 </header>
 
@@ -77,7 +119,6 @@
         <li><a href="#section=extra-scores" data-section="extra-scores">Extra Scores</a></li>
         <li><a href="#section=rationale" data-section="rationale">Rationale</a></li>
         <li><a href="#section=simulator" data-section="simulator">Simulator</a></li>
-        <li><a href="#section=python-cli" data-section="python-cli">Python CLI</a></li>
     </ul>
 </nav>
 
@@ -87,9 +128,19 @@
         <h2>📤 Upload your CSV</h2>
         <p>Export your peer assessment responses as a CSV and upload it below. The report generates instantly - your data never leaves your browser.</p>
         <div class="upload-section">
-            <p class="upload-label">Select your peer assessment CSV file</p>
-            <input type="file" id="csvFile" accept=".csv" />
-            <p class="upload-hint">Supported sources: Google Forms (via Google Sheets export) or Microsoft Forms (via Excel, saved as CSV).</p>
+            <p class="upload-label">Select your peer assessment CSV file(s)</p>
+            <div class="upload-options">
+                <div class="upload-option">
+                    <p class="upload-option-label">Single group</p>
+                    <input type="file" id="csvFile" accept=".csv" />
+                    <p class="upload-hint">Generates a report for one group.</p>
+                </div>
+                <div class="upload-option">
+                    <p class="upload-option-label">Cohort &mdash; multiple groups</p>
+                    <input type="file" id="csvFiles" accept=".csv" multiple />
+                    <p class="upload-hint">Processes all selected files and adds a cohort-level overview.</p>
+                </div>
+            </div>
         </div>
     </section>
 
@@ -99,9 +150,9 @@
         <h2>📋 How to Use</h2>
         <ol class="steps">
             <li>Set up a peer assessment form using any tool that supports CSV export (see <em>Setting Up Your Form</em> below) and collect responses.</li>
-            <li>Export the responses as a CSV file from your chosen platform.</li>
-            <li>Click <em>Select your peer assessment CSV file</em> above and choose the exported file.</li>
-            <li>The report generates instantly - normalised scores, summary table, and individual feedback with peer comments.</li>
+            <li>Export the responses as a CSV file from your chosen platform. Repeat for each group if processing a cohort.</li>
+            <li>Use <strong>Single group</strong> to upload one CSV, or <strong>Cohort &mdash; multiple groups</strong> to select all CSVs at once.</li>
+            <li>The report generates instantly. Single group: normalised scores, summary table, and individual feedback. Cohort: all of the above per group, plus a cohort-level overview with a group summary table, score distribution, and DNA list.</li>
         </ol>
         <div class="tip">No installation required. Your data never leaves your browser - all processing happens on your device.</div>
         <a href="#" class="back-to-top">Back to top</a>
@@ -361,13 +412,6 @@ Group median (normalised): 5</code></pre>
         <a href="#" class="back-to-top">Back to top</a>
     </section>
 
-    <section class="docs-section" id="python-cli">
-        <h2>🐍 Python CLI Version</h2>
-        <p>A command-line version is also available for batch processing or scripted workflows. It produces identical output to this web tool and requires only Python 3.6+ with no external dependencies.</p>
-        <pre><code>python3 pa_report.py "team1.csv"</code></pre>
-        <p>Download from the <a href="https://github.com/drdukegledhill/PeerAssessmentforTeamProjects" target="_blank" rel="noopener">GitHub repository</a>.</p>
-        <a href="#" class="back-to-top">Back to top</a>
-    </section>
 
 </div>
 
@@ -382,7 +426,7 @@ Group median (normalised): 5</code></pre>
 
 <script>
     // Section navigation: hash deep-linking and scroll-spy
-    const sectionIds = ['tool', 'how-to-use', 'setup', 'csv-format', 'normalisation', 'extra-scores', 'rationale', 'simulator', 'python-cli'];
+    const sectionIds = ['tool', 'how-to-use', 'setup', 'csv-format', 'normalisation', 'extra-scores', 'rationale', 'simulator'];
 
     function activateNavLink(sectionId) {
         document.querySelectorAll('.section-nav a[data-section]').forEach(a => {
@@ -443,16 +487,35 @@ Group median (normalised): 5</code></pre>
         document.getElementById(panelId).classList.add('active');
     }
 
-    // Only render analysed report, never raw CSV
+    // Single group upload
     document.getElementById('csvFile').addEventListener('change', function(e) {
         const file = e.target.files[0];
         if (!file) return;
         const reader = new FileReader();
-        reader.onload = function(e) {
-            const text = e.target.result;
-            processPeerAssessmentCSV(text);
+        reader.onload = function(ev) {
+            const data = parseGroupData(ev.target.result, file.name);
+            document.getElementById('output').innerHTML = data ? renderReport(data) : '<p>No data found.</p>';
         };
         reader.readAsText(file);
+    });
+
+    // Cohort (multiple groups) upload
+    document.getElementById('csvFiles').addEventListener('change', function(e) {
+        const files = Array.from(e.target.files);
+        if (!files.length) return;
+        const results = new Array(files.length);
+        let loaded = 0;
+        files.forEach((file, idx) => {
+            const reader = new FileReader();
+            reader.onload = function(ev) {
+                results[idx] = parseGroupData(ev.target.result, file.name);
+                if (++loaded === files.length) {
+                    const groups = results.filter(Boolean);
+                    document.getElementById('output').innerHTML = groups.length ? renderCohortView(groups) : '<p>No valid data found.</p>';
+                }
+            };
+            reader.readAsText(file);
+        });
     });
 
     // CSV parser that preserves empty cells
@@ -503,12 +566,9 @@ Group median (normalised): 5</code></pre>
       return rows;
     }
 
-    function processPeerAssessmentCSV(text) {
+    function parseGroupData(text, filename) {
         const rows = parseCSV(text);
-        if (!rows.length) {
-            document.getElementById('output').innerHTML = '<p>No data found.</p>';
-            return;
-        }
+        if (!rows.length) return null;
         const headers = rows[0];
         const data = rows.slice(1);
 
@@ -624,8 +684,7 @@ Group median (normalised): 5</code></pre>
             });
         });
 
-        // Render report
-        renderReport({students, rawAvgs, normalised, comments, groupMean, adjustment, nonAttendees, extraAvgs});
+        return {filename, students, rawAvgs, normalised, comments, groupMean, adjustment, nonAttendees, extraAvgs};
     }
 
     function renderReport({students, rawAvgs, normalised, comments, groupMean, adjustment, nonAttendees, extraAvgs}) {
@@ -698,7 +757,78 @@ Group median (normalised): 5</code></pre>
             }
             html += `</div>`;
         });
-        document.getElementById('output').innerHTML = html;
+        return html;
+    }
+
+    function renderCohortView(groups) {
+        const totalStudents = groups.reduce((n, g) => n + Object.keys(g.students).length, 0);
+        const totalDNA = groups.reduce((n, g) => n + g.nonAttendees.size, 0);
+
+        let html = `<h2>&#x1F4CA; Cohort Overview</h2>`;
+        html += `<p>${groups.length} group${groups.length !== 1 ? 's' : ''} &bull; ${totalStudents} students total &bull; ${totalDNA} DNA flag${totalDNA !== 1 ? 's' : ''}</p>`;
+
+        // Group summary table
+        html += `<h3>Group Summary</h3>`;
+        html += `<table><thead><tr>`;
+        html += `<th>Group</th><th>Students</th><th>DNA</th><th>Median (raw)</th><th>Adjustment</th><th>Score range</th><th>Median (norm)</th>`;
+        html += `</tr></thead><tbody>`;
+        groups.forEach(g => {
+            const studentList = Object.keys(g.students);
+            const normVals = studentList
+                .filter(s => !g.nonAttendees.has(s))
+                .map(s => g.normalised[s])
+                .sort((a, b) => a - b);
+            const grpNormMedian = normVals.length ? normVals[Math.floor(normVals.length / 2)] : '&ndash;';
+            const scoreRange = normVals.length ? `${normVals[0]}&ndash;${normVals[normVals.length - 1]}` : '&ndash;';
+            html += `<tr>`;
+            html += `<td>${g.filename}</td>`;
+            html += `<td>${studentList.length}</td>`;
+            html += `<td>${g.nonAttendees.size || '&ndash;'}</td>`;
+            html += `<td>${g.groupMean.toFixed(2)}</td>`;
+            html += `<td>${g.adjustment >= 0 ? '+' : ''}${g.adjustment.toFixed(2)}</td>`;
+            html += `<td>${scoreRange}</td>`;
+            html += `<td>${grpNormMedian}</td>`;
+            html += `</tr>`;
+        });
+        html += `</tbody></table>`;
+
+        // Score distribution across all groups
+        const dist = Array(10).fill(0);
+        groups.forEach(g => {
+            Object.entries(g.normalised).forEach(([student, score]) => {
+                if (!g.nonAttendees.has(student)) dist[score]++;
+            });
+        });
+        html += `<h3>Score Distribution (all students, excluding DNA)</h3>`;
+        html += `<table><thead><tr><th>Score</th>`;
+        dist.forEach((_, i) => { html += `<th style="text-align:center;">${i}</th>`; });
+        html += `</tr></thead><tbody><tr><td>Count</td>`;
+        dist.forEach(c => { html += `<td style="text-align:center;">${c || '&ndash;'}</td>`; });
+        html += `</tr></tbody></table>`;
+
+        // DNA list
+        if (totalDNA > 0) {
+            html += `<h3>Did Not Attend</h3><ul>`;
+            groups.forEach(g => {
+                g.nonAttendees.forEach(name => {
+                    html += `<li>${name} <span style="color:var(--text-muted);font-size:0.9em;">(${g.filename})</span></li>`;
+                });
+            });
+            html += `</ul>`;
+        }
+
+        // Individual group reports as collapsibles
+        html += `<h2>Individual Group Reports</h2>`;
+        groups.forEach(g => {
+            const n = Object.keys(g.students).length;
+            const dnaSuffix = g.nonAttendees.size ? `, ${g.nonAttendees.size} DNA` : '';
+            html += `<details class="group-report">`;
+            html += `<summary>${g.filename} <span style="font-weight:normal;color:var(--text-muted);font-size:0.88em;">(${n} student${n !== 1 ? 's' : ''}${dnaSuffix})</span></summary>`;
+            html += `<div class="group-report-body">${renderReport(g)}</div>`;
+            html += `</details>`;
+        });
+
+        return html;
     }
 </script>
 </body>

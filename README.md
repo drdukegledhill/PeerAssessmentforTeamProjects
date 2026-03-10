@@ -1,6 +1,6 @@
 # Peer Assessment for Team Projects
 
-A tool for analysing peer assessment data from team projects and generating normalised scores with individual feedback reports. Available as a browser-based web tool and a Python command-line script.
+A browser-based tool for analysing peer assessment data from team projects and generating normalised scores with individual feedback reports.
 
 ---
 
@@ -10,7 +10,7 @@ The easiest way to use this tool is via the hosted web version - no installation
 
 **[https://drdukegledhill.github.io/PeerAssessmentforTeamProjects/](https://drdukegledhill.github.io/PeerAssessmentforTeamProjects/)**
 
-Upload your CSV file and the report generates instantly in your browser. Your data never leaves your device.
+Upload a single group CSV and the report generates instantly in your browser. Or select multiple CSVs at once to process an entire cohort — all groups are processed independently, and a cohort-level overview (group summary, score distribution, DNA list) is generated alongside individual group reports. Your data never leaves your device.
 
 A companion **[Normalisation Simulator](https://drdukegledhill.github.io/PeerAssessmentforTeamProjects/simulator.html)** is also available for students to experiment with ratings interactively and see how normalisation responds in real time.
 
@@ -25,6 +25,7 @@ The tool processes peer assessment CSV files (exported from Google Forms or Micr
 - **Individual feedback** with aggregated peer comments
 - **Did Not Attend (DNA)** detection: students who receive all zeros from every peer rater are flagged and excluded from the normalisation reference
 - **Extra rating dimensions** (optional): any additional numeric columns in the CSV that mention a student's name are detected automatically, displayed alongside the main score (rounded using banker's rounding), and clearly labelled as not used in the normalisation calculation
+- **Cohort view**: upload multiple CSVs at once to process all groups simultaneously, with a cohort-level overview showing a group summary table, score distribution across all students, and a consolidated DNA list
 
 Students are detected automatically from column headers. Self-assessments are excluded from all calculations. The tool adapts to any group size.
 
@@ -75,84 +76,6 @@ Charlie,8,Led the project well,9,7,Helpful,6,6,Self assessment,6
 ```
 
 The "level of engagement" columns are optional extra dimensions. They will be detected automatically, displayed in the report, but not used in the normalisation calculation.
-
-### Example Output
-
-```
-Detected 3 students: Alice, Bob, Charlie
-
-====================================================================
-PEER ASSESSMENT REPORT
-====================================================================
-
-Total students: 3
-Group median (raw):           7.50
-Normalisation adjustment:    -2.50
-Target:                       5
-
-----------------------------------------------------------------
-SUMMARY TABLE
-----------------------------------------------------------------
-Student                          Raw Avg     Score  engagement
-----------------------------------------------------------------
-Alice                               7.50         5           8
-Bob                                 7.50         5           6
-Charlie                             6.50         4           6
-----------------------------------------------------------------
-Group median (normalised):                           5
-
-====================================================================
-INDIVIDUAL FEEDBACK
-====================================================================
-
->>> Alice
-    Score: 5
-
-    Extra scores (not used in calculations):
-      level of engagement: 8
-
-    Peer Comments:
-    - Very organised
-    - Led the project well
-
---------------------------------------------------------------------
-
->>> Bob
-    Score: 5
-
-    Extra scores (not used in calculations):
-      level of engagement: 6
-
-    Peer Comments:
-    - Great teamwork
-    - Helpful
-
---------------------------------------------------------------------
-
->>> Charlie
-    Score: 4
-
-    Extra scores (not used in calculations):
-      level of engagement: 6
-
-    Peer Comments:
-    - Could communicate more
-    - Reliable
-
---------------------------------------------------------------------
-```
-
----
-
-## 🐍 Python CLI
-
-A command-line version is available for batch processing or scripted workflows. It produces identical output to the web tool.
-
-**Requirements:** Python 3.6+, no external dependencies.
-
-```bash
-python3 pa_report.py "team1.csv"
-```
 
 ---
 

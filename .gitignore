@@ -3,3 +3,10 @@
 
 # Root-level docs provided externally
 /*.pdf
+
+# Temporary drafts
+temp.md
+temp.html
+
+# Python CLI (deprecated - web version only)
+pa_report.py
