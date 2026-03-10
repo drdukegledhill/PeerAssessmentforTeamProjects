@@ -29,7 +29,6 @@ const sectionIds = [
     'how-to-use',
     'setup',
     'csv-format',
-    'rating-guide',
     'normalisation',
     'extra-scores',
     'rationale',
