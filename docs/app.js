@@ -16,6 +16,12 @@
 
 'use strict';
 
+const exportActionsEl = document.getElementById('exportActions');
+const exportCsvBtnEl = document.getElementById('exportCsvBtn');
+const exportSummaryCsvBtnEl = document.getElementById('exportSummaryCsvBtn');
+const exportMetaEl = document.getElementById('exportMeta');
+let latestProcessed = null;
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Section navigation
 // ─────────────────────────────────────────────────────────────────────────────
@@ -141,6 +147,8 @@ document.getElementById('csvFile').addEventListener('change', function(e) {
         const data = parseGroupData(ev.target.result, file.name);
         document.getElementById('output').innerHTML =
             data ? renderReport(data) : '<p>No data found.</p>';
+        latestProcessed = data ? { mode: 'single', groups: [data] } : null;
+        syncExportActions();
     };
     reader.readAsText(file);
 });
@@ -167,11 +175,192 @@ document.getElementById('csvFiles').addEventListener('change', function(e) {
                 const groups = results.filter(Boolean);
                 document.getElementById('output').innerHTML =
                     groups.length ? renderCohortView(groups) : '<p>No valid data found.</p>';
+                latestProcessed = groups.length ? { mode: 'cohort', groups } : null;
+                syncExportActions();
             }
         };
         reader.readAsText(file);
     });
 });
+
+exportCsvBtnEl.addEventListener('click', function() {
+    if (!latestProcessed || !latestProcessed.groups.length) return;
+
+    const csvText = buildExportCsv(latestProcessed.groups);
+    const fileName = latestProcessed.mode === 'cohort'
+        ? 'peer-assessment-cohort-report.csv'
+        : `peer-assessment-${safeFileStem(latestProcessed.groups[0].filename)}-report.csv`;
+
+    downloadCsv(csvText, fileName);
+});
+
+exportSummaryCsvBtnEl.addEventListener('click', function() {
+    if (!latestProcessed || latestProcessed.mode !== 'cohort') return;
+
+    const csvText = buildCohortSummaryCsv(latestProcessed.groups);
+    downloadCsv(csvText, 'peer-assessment-cohort-summary.csv');
+});
+
+function syncExportActions() {
+    if (!latestProcessed || !latestProcessed.groups.length) {
+        exportActionsEl.hidden = true;
+        exportMetaEl.textContent = '';
+        return;
+    }
+
+    const totalStudents = latestProcessed.groups.reduce(
+        (n, g) => n + Object.keys(g.students).length,
+        0
+    );
+
+    exportActionsEl.hidden = false;
+    exportSummaryCsvBtnEl.hidden = latestProcessed.mode !== 'cohort';
+    exportMetaEl.textContent = latestProcessed.mode === 'cohort'
+        ? `${latestProcessed.groups.length} groups processed, ${totalStudents} student rows ready to export.`
+        : `${totalStudents} student rows ready to export.`;
+}
+
+function buildExportCsv(groups) {
+    const allExtraLabels = [];
+    const seenLabels = new Set();
+
+    groups.forEach(g => {
+        const firstStudent = Object.keys(g.students)[0];
+        const extra = ((g.students[firstStudent] || {}).extra || []).map(ec => ec.label);
+        extra.forEach(label => {
+            if (!seenLabels.has(label)) {
+                seenLabels.add(label);
+                allExtraLabels.push(label);
+            }
+        });
+    });
+
+    const baseHeaders = [
+        'Group',
+        'Student',
+        'Status',
+        'Raw Avg',
+        'Normalised Score',
+        'Group Median Raw',
+        'Adjustment',
+        'Group Median Normalised',
+        'Peer Comments'
+    ];
+    const headers = baseHeaders.concat(allExtraLabels.map(label => `Extra: ${label}`));
+
+    const rows = [headers];
+
+    groups.forEach(g => {
+        const studentList = Object.keys(g.students);
+        const groupNormMedian = getGroupNormalisedMedian(g);
+
+        studentList.forEach(student => {
+            const status = g.nonAttendees.has(student) ? 'DNA' : 'Attended';
+            const scoreValue = g.nonAttendees.has(student) ? 0 : g.normalised[student];
+            const row = [
+                g.filename,
+                student,
+                status,
+                g.rawAvgs[student].toFixed(2),
+                String(scoreValue),
+                g.groupMean.toFixed(2),
+                g.adjustment.toFixed(2),
+                String(groupNormMedian),
+                (g.comments[student] || []).join(' | ')
+            ];
+
+            allExtraLabels.forEach(label => {
+                const value = (g.extraAvgs[student] || {})[label];
+                row.push(value === undefined ? '' : String(value));
+            });
+
+            rows.push(row);
+        });
+    });
+
+    return rows.map(toCsvLine).join('\n');
+}
+
+function getGroupNormalisedMedian(groupData) {
+    const values = Object.keys(groupData.students)
+        .filter(student => !groupData.nonAttendees.has(student))
+        .map(student => groupData.normalised[student])
+        .sort((a, b) => a - b);
+
+    return values.length ? values[Math.floor(values.length / 2)] : '';
+}
+
+function buildCohortSummaryCsv(groups) {
+    const headers = [
+        'Group',
+        'Students',
+        'Attended',
+        'DNA',
+        'Median Raw',
+        'Adjustment',
+        'Median Normalised',
+        'Min Normalised',
+        'Max Normalised'
+    ];
+
+    const rows = [headers];
+
+    groups.forEach(groupData => {
+        const students = Object.keys(groupData.students);
+        const attendees = students.filter(student => !groupData.nonAttendees.has(student));
+        const normScores = attendees
+            .map(student => groupData.normalised[student])
+            .sort((a, b) => a - b);
+
+        const medianNorm = normScores.length
+            ? normScores[Math.floor(normScores.length / 2)]
+            : '';
+
+        rows.push([
+            groupData.filename,
+            String(students.length),
+            String(attendees.length),
+            String(groupData.nonAttendees.size),
+            groupData.groupMean.toFixed(2),
+            groupData.adjustment.toFixed(2),
+            String(medianNorm),
+            normScores.length ? String(normScores[0]) : '',
+            normScores.length ? String(normScores[normScores.length - 1]) : ''
+        ]);
+    });
+
+    return rows.map(toCsvLine).join('\n');
+}
+
+function toCsvLine(cells) {
+    return cells.map(cell => {
+        const value = String(cell ?? '');
+        if (/[",\n]/.test(value)) return '"' + value.replace(/"/g, '""') + '"';
+        return value;
+    }).join(',');
+}
+
+function safeFileStem(name) {
+    return String(name || 'group')
+        .replace(/\.csv$/i, '')
+        .replace(/[^a-z0-9._-]+/gi, '-')
+        .replace(/^-+|-+$/g, '')
+        .toLowerCase() || 'group';
+}
+
+function downloadCsv(csvText, fileName) {
+    const blob = new Blob([csvText], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+
+    link.href = url;
+    link.download = fileName;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+
+    URL.revokeObjectURL(url);
+}
 
 // ─────────────────────────────────────────────────────────────────────────────
 // CSV parser
