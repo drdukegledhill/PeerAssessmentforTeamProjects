@@ -9,5 +9,10 @@ temp.md
 temp.html
 bs.html
 
+# Local agent/editor artifacts
+.claude/
+memory/
+__pycache__/
+
 # Python CLI (deprecated - web version only)
 pa_report.py
