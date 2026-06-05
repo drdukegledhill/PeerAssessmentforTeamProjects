@@ -4,6 +4,10 @@ const BEGIN_MARKER = "PA-RESPONSE-BEGIN";
 const END_MARKER = "PA-RESPONSE-END";
 
 const teamsJsonFileEl = document.getElementById("teamsJsonFile");
+const emailPreambleEl = document.getElementById("emailPreamble");
+const emailPostambleEl = document.getElementById("emailPostamble");
+const previewMetaEl = document.getElementById("previewMeta");
+const emailPreviewEl = document.getElementById("emailPreview");
 const downloadEmailZipBtnEl = document.getElementById("downloadEmailZipBtn");
 const phase1MetaEl = document.getElementById("phase1Meta");
 
@@ -38,6 +42,9 @@ setStepStatus(step1StatusEl, "locked");
 setStepStatus(step2StatusEl, "locked");
 setStepStatus(step3StatusEl, "locked");
 
+emailPreambleEl.addEventListener("input", refreshEmailPreview);
+emailPostambleEl.addEventListener("input", refreshEmailPreview);
+
 teamsJsonFileEl.addEventListener("change", async function (e) {
     const file = e.target.files[0];
     if (!file) return;
@@ -66,6 +73,7 @@ teamsJsonFileEl.addEventListener("change", async function (e) {
         setStepStatus(step1StatusEl, "ready");
         setStepStatus(step2StatusEl, "ready");
         setStepStatus(step3StatusEl, "locked");
+        refreshEmailPreview();
     } catch (err) {
         loadedConfig = null;
         downloadEmailZipBtnEl.disabled = true;
@@ -78,6 +86,7 @@ teamsJsonFileEl.addEventListener("change", async function (e) {
         setStepStatus(step1StatusEl, "locked");
         setStepStatus(step2StatusEl, "locked");
         setStepStatus(step3StatusEl, "locked");
+        refreshEmailPreview();
     }
 });
 
@@ -97,7 +106,15 @@ downloadEmailZipBtnEl.addEventListener("click", async function () {
         team.students.forEach((student) => {
             const teammates = team.students.filter((s) => s.name !== student.name).map((s) => s.name);
             const subject = `[PA|${loadedConfig.module}|${team.name}|${student.name}] Peer Assessment Response`;
-            const body = buildResponseBody(loadedConfig.module, loadedConfig.cohort, team.name, student.name, teammates);
+            const body = buildResponseBody(
+                loadedConfig.module,
+                loadedConfig.cohort,
+                team.name,
+                student.name,
+                teammates,
+                emailPreambleEl.value,
+                emailPostambleEl.value
+            );
             const eml = buildEml(student.email || "", subject, body);
 
             teamFolder.file(`${slugify(student.name)}.eml`, eml);
@@ -113,6 +130,7 @@ downloadEmailZipBtnEl.addEventListener("click", async function () {
     phase1MetaEl.innerHTML = '<span class="pill">done</span>Outbound EML zip generated.';
     setStepStatus(step1StatusEl, "done");
     setStepStatus(step2StatusEl, "ready");
+    refreshEmailPreview();
 });
 
 parseRepliesBtnEl.addEventListener("click", async function () {
@@ -286,8 +304,13 @@ function normalizeConfig(cfg) {
     };
 }
 
-function buildResponseBody(moduleCode, cohort, teamName, raterName, teammates) {
+function buildResponseBody(moduleCode, cohort, teamName, raterName, teammates, preamble, postamble) {
     const lines = [];
+    if (String(preamble || "").trim()) {
+        lines.push(String(preamble).trim());
+        lines.push("");
+    }
+
     lines.push("Please complete this template and reply, keeping the subject unchanged.");
     lines.push("For each teammate, provide both numeric ratings and a plain-text feedback comment.");
     lines.push("Use one line per teammate in CSV format:");
@@ -305,7 +328,45 @@ function buildResponseBody(moduleCode, cohort, teamName, raterName, teammates) {
     lines.push(END_MARKER);
     lines.push("");
     lines.push("Important: do not change names in the first column.");
+
+    if (String(postamble || "").trim()) {
+        lines.push("");
+        lines.push(String(postamble).trim());
+    }
+
     return lines.join("\n");
+}
+
+function refreshEmailPreview() {
+    if (!loadedConfig || !loadedConfig.teams.length) {
+        previewMetaEl.textContent = "Load teams.json to preview the outbound email template.";
+        emailPreviewEl.textContent = "";
+        return;
+    }
+
+    const team = loadedConfig.teams[0];
+    const student = team.students[0];
+    if (!team || !student) {
+        previewMetaEl.textContent = "No team/student available in config for preview.";
+        emailPreviewEl.textContent = "";
+        return;
+    }
+
+    const teammates = team.students.filter((s) => s.name !== student.name).map((s) => s.name);
+    const subject = `[PA|${loadedConfig.module}|${team.name}|${student.name}] Peer Assessment Response`;
+    const body = buildResponseBody(
+        loadedConfig.module,
+        loadedConfig.cohort,
+        team.name,
+        student.name,
+        teammates,
+        emailPreambleEl.value,
+        emailPostambleEl.value
+    );
+    const eml = buildEml(student.email || "", subject, body);
+
+    previewMetaEl.textContent = `Previewing first outbound message: ${team.name} -> ${student.name}`;
+    emailPreviewEl.textContent = eml;
 }
 
 function buildEml(to, subject, body) {

@@ -171,10 +171,26 @@
             <label for="teamsJsonFile">teams.json:</label>
             <input type="file" id="teamsJsonFile" accept=".json,application/json">
         </div>
+        <div class="row" style="display:block;">
+            <label for="emailPreamble">Email preamble (optional)</label>
+            <textarea id="emailPreamble" rows="4" style="width:100%;padding:0.6em;border:1px solid var(--border);border-radius:8px;">Hi team,
+
+Please complete your peer assessment by replying to this email.</textarea>
+        </div>
+        <div class="row" style="display:block;">
+            <label for="emailPostamble">Email postamble (optional)</label>
+            <textarea id="emailPostamble" rows="3" style="width:100%;padding:0.6em;border:1px solid var(--border);border-radius:8px;">Thanks,
+Module team</textarea>
+        </div>
         <div class="row">
             <button id="downloadEmailZipBtn" class="btn" disabled>Download EML Zip</button>
         </div>
         <p id="phase1Meta" class="meta"></p>
+        <div class="row" style="display:block;">
+            <label>Email preview</label>
+            <p id="previewMeta" class="meta">Load teams.json to preview the outbound email template.</p>
+            <pre id="emailPreview" style="margin:0;padding:0.7em;white-space:pre-wrap;word-break:break-word;max-height:260px;overflow:auto;background:#f8fafc;border:1px solid var(--border);border-radius:8px;"></pre>
+        </div>
     </section>
 
     <section class="phase-card">
