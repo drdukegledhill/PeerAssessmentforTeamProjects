@@ -1,0 +1,24 @@
+{
+  "module": "NHE2443",
+  "cohort": "Final",
+  "teams": [
+    {
+      "name": "Team Nightmare",
+      "students": [
+        { "name": "Duke Gledhill", "email": "d.gledhill@hud.ac.uk" },
+        { "name": "Student Two", "email": "student.two@university.ac.uk" },
+        { "name": "Student Three", "email": "student.three@university.ac.uk" },
+        { "name": "Student Four", "email": "student.four@university.ac.uk" }
+      ]
+    },
+    {
+      "name": "Team Dodgefathers",
+      "students": [
+        { "name": "Student Five", "email": "student.five@university.ac.uk" },
+        { "name": "Student Six", "email": "student.six@university.ac.uk" },
+        { "name": "Student Seven", "email": "student.seven@university.ac.uk" },
+        { "name": "Student Eight", "email": "student.eight@university.ac.uk" }
+      ]
+    }
+  ]
+}

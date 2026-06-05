@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Peer Assessment Email Workflow (Test)</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .stepper {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 0.75em;
+            margin: 0 0 1.1em;
+        }
+        .step {
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 0.8em 0.9em;
+            box-shadow: var(--shadow);
+        }
+        .step h3 {
+            margin: 0 0 0.25em;
+            color: var(--text);
+            font-size: 0.98em;
+        }
+        .status {
+            display: inline-block;
+            border-radius: 999px;
+            font-size: 0.74em;
+            font-weight: bold;
+            padding: 0.14em 0.55em;
+            color: #fff;
+            background: #64748b;
+        }
+        .status.ready { background: #0369a1; }
+        .status.done { background: #166534; }
+        .status.locked { background: #64748b; }
+
+        .phase-card {
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 1.25em 1.4em;
+            margin-bottom: 1.1em;
+        }
+        .phase-title {
+            margin: 0 0 0.4em;
+            color: var(--blue);
+        }
+        .phase-sub {
+            margin: 0 0 1em;
+            color: var(--text-muted);
+            font-size: 0.92em;
+        }
+        .row {
+            display: flex;
+            gap: 0.75em;
+            flex-wrap: wrap;
+            align-items: center;
+            margin: 0.55em 0;
+        }
+        .row label {
+            font-weight: bold;
+            color: var(--text);
+        }
+        .btn {
+            border: 1px solid var(--blue);
+            background: var(--blue);
+            color: #fff;
+            border-radius: 6px;
+            padding: 0.52em 0.85em;
+            font-size: 0.92em;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .btn.secondary {
+            background: var(--white);
+            color: var(--blue);
+        }
+        .meta {
+            margin: 0.4em 0 0;
+            color: var(--text-muted);
+            font-size: 0.9em;
+        }
+        .pill {
+            display: inline-block;
+            font-size: 0.8em;
+            color: #fff;
+            background: var(--blue);
+            border-radius: 999px;
+            padding: 0.18em 0.55em;
+            margin-right: 0.35em;
+        }
+        .issues {
+            background: #fff7ed;
+            border: 1px solid #fdba74;
+            color: #9a3412;
+            border-radius: 8px;
+            padding: 0.65em 0.8em;
+            margin-top: 0.6em;
+            font-size: 0.9em;
+        }
+        .nav-link {
+            display: inline-block;
+            margin-top: 0.55em;
+            color: var(--blue);
+            font-weight: bold;
+            text-decoration: none;
+        }
+        .nav-link:hover { text-decoration: underline; }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 0.5em;
+            margin-top: 0.65em;
+        }
+        .stat {
+            background: #f8fafc;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 0.5em 0.6em;
+        }
+        .stat .k {
+            display: block;
+            color: var(--text-muted);
+            font-size: 0.75em;
+            margin-bottom: 0.1em;
+        }
+        .stat .v {
+            font-weight: bold;
+            color: var(--blue);
+            font-size: 1em;
+        }
+        @media (max-width: 760px) {
+            .stepper { grid-template-columns: 1fr; }
+            .stats-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        }
+    </style>
+</head>
+<body>
+<header>
+    <div class="container">
+        <h1>Peer Assessment Email Workflow <span class="version">test</span></h1>
+        <p class="subtitle">Three-phase browser workflow: generate outbound EML files from teams.json, parse returned replies, and run the normalisation analysis directly.</p>
+        <a class="nav-link" href="index.html">Back to main analyser</a>
+    </div>
+</header>
+
+<div class="container">
+    <section class="stepper" aria-label="Workflow progress">
+        <article class="step">
+            <h3>1. Prepare Emails</h3>
+            <span id="step1Status" class="status locked">Locked</span>
+        </article>
+        <article class="step">
+            <h3>2. Parse Replies</h3>
+            <span id="step2Status" class="status locked">Locked</span>
+        </article>
+        <article class="step">
+            <h3>3. Analyse Results</h3>
+            <span id="step3Status" class="status locked">Locked</span>
+        </article>
+    </section>
+
+    <section class="phase-card">
+        <h2 class="phase-title">Phase 1 - Prepare Emails</h2>
+        <p class="phase-sub">Upload teams.json, then generate a zip containing one EML per student plus a mail merge CSV.</p>
+        <div class="row">
+            <label for="teamsJsonFile">teams.json:</label>
+            <input type="file" id="teamsJsonFile" accept=".json,application/json">
+        </div>
+        <div class="row">
+            <button id="downloadEmailZipBtn" class="btn" disabled>Download EML Zip</button>
+        </div>
+        <p id="phase1Meta" class="meta"></p>
+    </section>
+
+    <section class="phase-card">
+        <h2 class="phase-title">Phase 2 - Parse Replies</h2>
+        <p class="phase-sub">Upload exported reply files (.eml or .txt). The parser builds per-team CSV files and a submission dashboard.</p>
+        <div class="row">
+            <label for="replyFiles">Reply files:</label>
+            <input type="file" id="replyFiles" accept=".eml,.txt,text/plain,message/rfc822" multiple>
+        </div>
+        <div class="row">
+            <label for="dedupeStrategy">Dedupe:</label>
+            <select id="dedupeStrategy">
+                <option value="latest" selected>Latest response per rater</option>
+                <option value="first">First response per rater</option>
+                <option value="all">Keep all duplicates</option>
+            </select>
+            <button id="parseRepliesBtn" class="btn" disabled>Parse Replies</button>
+            <button id="downloadCsvZipBtn" class="btn secondary" disabled>Download CSV Outputs Zip</button>
+        </div>
+        <p id="phase2Meta" class="meta"></p>
+        <div id="phase2Stats" class="stats-grid" hidden>
+            <div class="stat"><span class="k">Files processed</span><span class="v" id="statFilesProcessed">0</span></div>
+            <div class="stat"><span class="k">Valid replies</span><span class="v" id="statValidReplies">0</span></div>
+            <div class="stat"><span class="k">Duplicates dropped</span><span class="v" id="statDuplicatesDropped">0</span></div>
+            <div class="stat"><span class="k">Issues</span><span class="v" id="statIssues">0</span></div>
+            <div class="stat"><span class="k">Teams exported</span><span class="v" id="statTeamsExported">0</span></div>
+            <div class="stat"><span class="k">Expected submissions</span><span class="v" id="statExpectedSubmissions">0</span></div>
+            <div class="stat"><span class="k">Submitted unique</span><span class="v" id="statSubmittedUnique">0</span></div>
+            <div class="stat"><span class="k">Missing submissions</span><span class="v" id="statMissingSubmissions">0</span></div>
+        </div>
+        <div id="issuesBox" class="issues" hidden></div>
+    </section>
+
+    <section class="phase-card">
+        <h2 class="phase-title">Phase 3 - Analyse Outputs</h2>
+        <p class="phase-sub">Run the same normalisation logic on parsed team CSVs and render the cohort report below.</p>
+        <div class="row">
+            <button id="runAnalysisBtn" class="btn" disabled>Run Analysis</button>
+        </div>
+        <div id="analysisOutput"></div>
+    </section>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+<script src="workflow.js"></script>
+</body>
+</html>

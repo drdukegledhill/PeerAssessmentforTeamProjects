@@ -1,0 +1,41 @@
+{
+  "module": "NHE2443",
+  "cohort": "Final",
+  "teams": [
+    {
+      "name": "Team Atlas",
+      "students": [
+        { "name": "Aisha Khan", "email": "d.gledhill@hud.ac.uk" },
+        { "name": "Ben Carter", "email": "d.gledhill@hud.ac.uk" }
+      ]
+    },
+    {
+      "name": "Team Beacon",
+      "students": [
+        { "name": "Chloe Martin", "email": "d.gledhill@hud.ac.uk" },
+        { "name": "Daniel Price", "email": "d.gledhill@hud.ac.uk" }
+      ]
+    },
+    {
+      "name": "Team Cedar",
+      "students": [
+        { "name": "Ethan Ward", "email": "d.gledhill@hud.ac.uk" },
+        { "name": "Freya Lewis", "email": "d.gledhill@hud.ac.uk" }
+      ]
+    },
+    {
+      "name": "Team Delta",
+      "students": [
+        { "name": "Grace Patel", "email": "d.gledhill@hud.ac.uk" },
+        { "name": "Hugo Reed", "email": "d.gledhill@hud.ac.uk" }
+      ]
+    },
+    {
+      "name": "Team Ember",
+      "students": [
+        { "name": "Isla Morgan", "email": "d.gledhill@hud.ac.uk" },
+        { "name": "Jack Turner", "email": "d.gledhill@hud.ac.uk" }
+      ]
+    }
+  ]
+}
