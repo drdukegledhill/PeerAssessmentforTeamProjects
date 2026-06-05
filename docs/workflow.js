@@ -306,8 +306,9 @@ function normalizeConfig(cfg) {
 
 function buildResponseBody(moduleCode, cohort, teamName, raterName, teammates, preamble, postamble) {
     const lines = [];
-    if (String(preamble || "").trim()) {
-        lines.push(String(preamble).trim());
+    const personalisedPreamble = personaliseForRecipient(String(preamble || ""), raterName);
+    if (String(personalisedPreamble || "").trim()) {
+        lines.push(String(personalisedPreamble).trim());
         lines.push("");
     }
 
@@ -329,12 +330,19 @@ function buildResponseBody(moduleCode, cohort, teamName, raterName, teammates, p
     lines.push("");
     lines.push("Important: do not change names in the first column.");
 
-    if (String(postamble || "").trim()) {
+    const personalisedPostamble = personaliseForRecipient(String(postamble || ""), raterName);
+    if (String(personalisedPostamble || "").trim()) {
         lines.push("");
-        lines.push(String(postamble).trim());
+        lines.push(String(personalisedPostamble).trim());
     }
 
     return lines.join("\n");
+}
+
+function personaliseForRecipient(text, fullName) {
+    const trimmed = String(fullName || "").trim();
+    const firstName = trimmed ? trimmed.split(/\s+/)[0] : "student";
+    return String(text || "").replace(/<firstname>/gi, firstName);
 }
 
 function refreshEmailPreview() {

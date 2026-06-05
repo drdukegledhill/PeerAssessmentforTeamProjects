@@ -45,6 +45,9 @@ Use `docs/workflow.html` for the full GDPR-safe email pipeline in your browser:
 
 1. **Prepare emails**
    - Upload `teams.json` (or `teams.example.json` as a template)
+  - Optionally add custom preamble and postamble text
+  - Use `<firstname>` in your text for per-recipient personalization (e.g. `Hi <firstname>,`)
+  - Review the live email preview before download
    - Download a zip containing one `.eml` per student plus `outlook_mailmerge.csv`
 2. **Parse replies**
    - Upload exported Outlook reply files (`.eml` or `.txt`)
