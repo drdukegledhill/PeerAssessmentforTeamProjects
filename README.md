@@ -37,122 +37,50 @@ Students are detected automatically from column headers. Self-assessments are ex
 
 ## ⚙️ Setting Up Your Form
 
-### Build `teams.json` from a roster CSV
+This project is now web-only.
 
-To avoid manual editing, you can generate the shared config file from a simple class roster CSV.
+### Three-Phase Email Workflow (Browser)
 
-- Script: `build_teams_config.py`
-- Input headers (case-insensitive):
-   - required: `team` (or `group`), `name` (or `student`)
-   - optional: `email`
+Use `docs/workflow.html` for the full GDPR-safe email pipeline in your browser:
 
-Command:
+1. **Prepare emails**
+   - Upload `teams.json` (or `teams.example.json` as a template)
+   - Download a zip containing one `.eml` per student plus `outlook_mailmerge.csv`
+2. **Parse replies**
+   - Upload exported Outlook reply files (`.eml` or `.txt`)
+   - Choose dedupe mode (latest, first, keep all)
+   - Download parsed outputs zip with:
+     - per-team CSV files
+     - `submission_dashboard.csv`
+     - `missing_students.csv`
+     - `parse_issues.csv` (if needed)
+3. **Analyse outputs**
+   - Run analysis directly on the page
+   - Or open `docs/index.html` and upload the generated team CSV files
 
-`python3 build_teams_config.py --roster roster.csv --module NHE2443 --cohort Final --out teams.json`
+### `teams.json` Format
 
-This creates a unified `teams.json` compatible with both:
+Use a config like:
 
-- `gdpr_form_system.py`
-- `email_pa_workflow.py`
+```json
+{
+  "module": "NHE2443",
+  "cohort": "Final",
+  "teams": [
+    {
+      "name": "Team Atlas",
+      "students": [
+        { "name": "Aisha Khan", "email": "aisha@university.ac.uk" },
+        { "name": "Ben Carter", "email": "ben@university.ac.uk" }
+      ]
+    }
+  ]
+}
+```
 
-### GDPR-safe self-hosted scripted option (recommended when Google/Microsoft Forms are restricted)
+Reply templates collect both numeric ratings and plain-text feedback per teammate.
 
-If you cannot use SaaS form platforms for GDPR reasons, this repository now includes a local, scriptable form system:
-
-- Script file: `gdpr_form_system.py`
-- Shared config template: `teams.example.json`
-
-Key properties:
-
-- **Self-hosted**: runs on your own machine/server (SQLite + built-in Python HTTP server)
-- **Scriptable**: forms are generated from a JSON team list
-- **Pseudonym mode**: web forms show aliases (`M01`, `M02`, ...), not student names
-- **Compatible export**: outputs CSV files in the same structure used by `pa_report.py`
-
-Quick start:
-
-1. Create your team config JSON (copy `teams.example.json`).
-2. Initialise surveys and links:
-   - `python3 gdpr_form_system.py init --config teams.json --db peer_forms.db --host 127.0.0.1 --port 8080`
-3. Run the form server:
-   - `python3 gdpr_form_system.py run --db peer_forms.db --host 127.0.0.1 --port 8080`
-4. Distribute one link per team. Keep `alias_mapping.csv` private.
-5. Export completed responses:
-   - `python3 gdpr_form_system.py export --db peer_forms.db --outdir exports --decode-names`
-6. Run reports in the browser tool (recommended):
-   - open `docs/index.html` and upload the exported CSV(s)
-
-Optional legacy CLI path:
-
-- `python3 pa_report.py exports/<team-file>.csv`
-
-Notes:
-
-- If you must avoid names on web pages, do **not** share the alias mapping publicly.
-- Students can still rate known peers by using the alias list provided in class/VLE.
-- `--decode-names` on export converts aliases back to names for staff-only reporting.
-
-### Outlook email workflow (no form platform, no mailbox API)
-
-If your university blocks mailbox API access and only allows Outlook clients, use the email pipeline:
-
-- Script file: `email_pa_workflow.py`
-- Shared config template: `teams.example.json`
-
-Why this works for constrained O365 environments:
-
-- No external mailbox/API integration required
-- Students reply via normal Outlook email
-- You export replies from Outlook as `.eml` files and parse locally
-- Output is per-team CSV ready for this browser tool (`docs/`)
-
-1) Generate templates and mail-merge CSV
-
-`python3 email_pa_workflow.py generate --config teams.json --outdir email_templates`
-
-This creates:
-- Per-student draft templates (with fixed machine-parseable response block)
-- `outlook_mailmerge.csv` for bulk send workflows
-
-2) Collect responses in Outlook
-
-- Use a subject prefix like `[PA|...]` (already in templates)
-- Create an Outlook rule to move those replies into a dedicated folder
-- Bulk export that folder to `.eml` files (or save selected messages as `.eml`/`.txt`)
-
-3) Parse replies and build group CSVs
-
-`python3 email_pa_workflow.py parse --config teams.json --emails-dir replies_eml --outdir exports`
-
-This creates one CSV per team in the same format expected by the browser app upload.
-
-Recommended for real cohorts:
-
-`python3 email_pa_workflow.py parse --config teams.json --emails-dir replies_eml --outdir exports --dedupe-strategy latest`
-
-Parse outputs now include:
-
-- Team CSV files for browser upload
-- `submission_dashboard.csv` (expected/submitted/missing by team)
-- `missing_students.csv` (flat follow-up list)
-- `parse_issues.csv` (only when malformed/unmatched replies exist)
-
-Duplicate handling:
-
-- Default is one response per rater, keeping the latest: `--dedupe-strategy latest`
-- Alternative: keep earliest response with `--dedupe-strategy first`
-- To retain all duplicates (usually not recommended): `--allow-duplicates`
-
-4) Use the browser app
-
-- Open the tool in `docs/`
-- Upload the generated team CSV files (single group or cohort mode)
-
-Operational note for large cohorts (e.g., 900 students):
-
-- Route all peer-assessment replies into one Outlook folder with rules
-- Run the parser repeatedly as new replies arrive
-- Review `parse_issues.csv` for malformed responses and follow up only with those students
+If feedback contains commas, it should be wrapped in double quotes.
 
 ### Google Forms
 

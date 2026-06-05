@@ -289,15 +289,19 @@ function normalizeConfig(cfg) {
 function buildResponseBody(moduleCode, cohort, teamName, raterName, teammates) {
     const lines = [];
     lines.push("Please complete this template and reply, keeping the subject unchanged.");
+    lines.push("For each teammate, provide both numeric ratings and a plain-text feedback comment.");
     lines.push("Use one line per teammate in CSV format:");
     lines.push("Name,Overall(0-9),Engagement(0-9),Communication(0-9),Quantity(1-5),Quality(1-5),Justification");
+    lines.push("The final column is free text feedback (single line per teammate).");
+    lines.push("If your feedback contains commas, wrap the feedback in double quotes.");
+    lines.push("Please keep names in column 1 unchanged.");
     lines.push("");
     lines.push(BEGIN_MARKER);
     lines.push(`MODULE,${moduleCode}`);
     lines.push(`COHORT,${cohort}`);
     lines.push(`TEAM,${teamName}`);
     lines.push(`RATER,${raterName}`);
-    teammates.forEach((mate) => lines.push(`${mate},,,,,,`));
+    teammates.forEach((mate) => lines.push(`${mate},,,,,,Write one or two sentences of constructive feedback`));
     lines.push(END_MARKER);
     lines.push("");
     lines.push("Important: do not change names in the first column.");
@@ -332,7 +336,7 @@ function parseResponseBlock(block) {
     const ratings = [];
 
     lines.forEach((line) => {
-        const parts = line.split(",").map((x) => x.trim());
+        const parts = parseCsvLine(line).map((x) => x.trim());
         const key = (parts[0] || "").toUpperCase();
 
         if (["MODULE", "COHORT", "TEAM", "RATER"].includes(key)) {
@@ -347,11 +351,53 @@ function parseResponseBlock(block) {
             communication: parts[3] || "",
             quantity: parts[4] || "",
             quality: parts[5] || "",
-            justification: parts.slice(6).join(",").trim(),
+            justification: normalizeFeedbackText(parts.slice(6).join(",").trim()),
         });
     });
 
     return { meta, ratings };
+}
+
+function parseCsvLine(line) {
+    const row = [];
+    let field = "";
+    let inQuotes = false;
+
+    for (let i = 0; i < line.length; i++) {
+        const ch = line[i];
+        const next = line[i + 1];
+
+        if (inQuotes) {
+            if (ch === '"' && next === '"') {
+                field += '"';
+                i++;
+            } else if (ch === '"') {
+                inQuotes = false;
+            } else {
+                field += ch;
+            }
+        } else {
+            if (ch === '"') {
+                inQuotes = true;
+            } else if (ch === ",") {
+                row.push(field);
+                field = "";
+            } else {
+                field += ch;
+            }
+        }
+    }
+
+    row.push(field);
+    return row;
+}
+
+function normalizeFeedbackText(value) {
+    let text = String(value || "").trim();
+    if (text.length >= 2 && text.startsWith('"') && text.endsWith('"')) {
+        text = text.slice(1, -1).replace(/""/g, '"').trim();
+    }
+    return text;
 }
 
 function resolveDuplicates(collected, strategy) {
